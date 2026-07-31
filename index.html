@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Blackjack</title>
+<style>
+  body {
+    background: #0b6623;
+    color: #fff;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  h1 { margin-bottom: 0; }
+  .info { font-size: 18px; margin: 10px 0; }
+  .hand-label { font-size: 20px; font-weight: bold; margin-top: 20px; }
+  .cards {
+    display: flex;
+    gap: 8px;
+    min-height: 100px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .card {
+    width: 65px;
+    height: 95px;
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  }
+  .card.red { color: #d40000; }
+  .card.hidden {
+    background: repeating-linear-gradient(45deg, #333, #333 5px, #444 5px, #444 10px);
+  }
+  .controls { margin-top: 25px; display: flex; gap: 12px; }
+  button {
+    padding: 12px 24px;
+    font-size: 16px;
+    background: #ffd038;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:disabled { background: #777; cursor: not-allowed; }
+  #message {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    min-height: 32px;
+  }
+  #chips { font-size: 18px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Blackjack</h1>
+<div id="chips">Chips: 500</div>
+
+<div class="hand-label">Dealer</div>
+<div class="cards" id="dealerCards"></div>
+<div class="info" id="dealerScore"></div>
+
+<div class="hand-label">Du</div>
+<div class="cards" id="playerCards"></div>
+<div class="info" id="playerScore"></div>
+
+<div id="message"></div>
+
+<div class="controls">
+  <button id="hitBtn">Hit</button>
+  <button id="standBtn">Stand</button>
+  <button id="newBtn">Neues Spiel</button>
+</div>
+
+<script>
+let deck = [];
+let playerHand = [];
+let dealerHand = [];
+let chips = 500;
+let gameOver = false;
+
+const suits = ["♠", "♥", "♦", "♣"];
+const values = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+
+function buildDeck() {
+  deck = [];
+  for (const s of suits) {
+    for (const v of values) {
+      deck.push({ value: v, suit: s });
+    }
+  }
+  // shuffle
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+}
+
+function cardValue(card) {
+  if (["J","Q","K"].includes(card.value)) return 10;
+  if (card.value === "A") return 11;
+  return parseInt(card.value);
+}
+
+function handScore(hand) {
+  let score = hand.reduce((sum, c) => sum + cardValue(c), 0);
+  let aces = hand.filter(c => c.value === "A").length;
+  while (score > 21 && aces > 0) {
+    score -= 10;
+    aces--;
+  }
+  return score;
+}
+
+function renderCard(card, hidden = false) {
+  const div = document.createElement("div");
+  div.className = "card" + ((card.suit === "♥" || card.suit === "♦") && !hidden ? " red" : "");
+  if (hidden) {
+    div.classList.add("hidden");
+  } else {
+    div.innerHTML = card.value + "<br>" + card.suit;
+  }
+  return div;
+}
+
+function render(revealDealer = false) {
+  const dealerDiv = document.getElementById("dealerCards");
+  const playerDiv = document.getElementById("playerCards");
+  dealerDiv.innerHTML = "";
+  playerDiv.innerHTML = "";
+
+  dealerHand.forEach((c, i) => {
+    dealerDiv.appendChild(renderCard(c, i === 1 && !revealDealer));
+  });
+  playerHand.forEach(c => playerDiv.appendChild(renderCard(c)));
+
+  document.getElementById("playerScore").textContent = "Punkte: " + handScore(playerHand);
+  document.getElementById("dealerScore").textContent = revealDealer
+    ? "Punkte: " + handScore(dealerHand)
+    : "Punkte: " + cardValue(dealerHand[0]) + " + ?";
+
+  document.getElementById("chips").textContent = "Chips: " + chips;
+}
+
+function startGame() {
+  if (chips <= 0) chips = 500;
+  buildDeck();
+  playerHand = [deck.pop(), deck.pop()];
+  dealerHand = [deck.pop(), deck.pop()];
+  gameOver = false;
+  document.getElementById("message").textContent = "";
+  document.getElementById("hitBtn").disabled = false;
+  document.getElementById("standBtn").disabled = false;
+  render(false);
+
+  if (handScore(playerHand) === 21) {
+    endGame("blackjack");
+  }
+}
+
+function hit() {
+  if (gameOver) return;
+  playerHand.push(deck.pop());
+  render(false);
+  if (handScore(playerHand) > 21) {
+    endGame("bust");
+  }
+}
+
+function stand() {
+  if (gameOver) return;
+  while (handScore(dealerHand) < 17) {
+    dealerHand.push(deck.pop());
+  }
+  render(true);
+  const p = handScore(playerHand);
+  const d = handScore(dealerHand);
+  if (d > 21 || p > d) endGame("win");
+  else if (p === d) endGame("push");
+  else endGame("lose");
+}
+
+function endGame(result) {
+  gameOver = true;
+  document.getElementById("hitBtn").disabled = true;
+  document.getElementById("standBtn").disabled = true;
+  render(true);
+
+  const msg = document.getElementById("message");
+  if (result === "blackjack") {
+    msg.textContent = "Blackjack! Du gewinnst!";
+    chips += 75;
+  } else if (result === "bust") {
+    msg.textContent = "Bust! Du verlierst.";
+    chips -= 50;
+  } else if (result === "win") {
+    msg.textContent = "Du gewinnst!";
+    chips += 50;
+  } else if (result === "lose") {
+    msg.textContent = "Dealer gewinnt.";
+    chips -= 50;
+  } else if (result === "push") {
+    msg.textContent = "Unentschieden.";
+  }
+  document.getElementById("chips").textContent = "Chips: " + chips;
+}
+
+document.getElementById("hitBtn").addEventListener("click", hit);
+document.getElementById("standBtn").addEventListener("click", stand);
+document.getElementById("newBtn").addEventListener("click", startGame);
+
+startGame();
+</script>
+
+</body>
+</html>
