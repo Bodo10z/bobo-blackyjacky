@@ -4,92 +4,233 @@
 <meta charset="UTF-8">
 <title>Blackjack</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap');
+
+  * { box-sizing: border-box; }
+
   body {
-    background: #0b6623;
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(ellipse at center, #0f5c33 0%, #073219 70%, #041a0d 100%);
     color: #fff;
-    font-family: sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
+    padding: 30px 20px;
   }
-  h1 { margin-bottom: 0; }
-  .info { font-size: 18px; margin: 10px 0; }
-  .hand-label { font-size: 20px; font-weight: bold; margin-top: 20px; }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    margin: 0 0 4px 0;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  }
+
+  .subtitle {
+    color: #8fd9ac;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .top-bar {
+    display: flex;
+    gap: 30px;
+    background: rgba(0,0,0,0.3);
+    padding: 12px 30px;
+    border-radius: 40px;
+    border: 1px solid rgba(255,215,0,0.3);
+    margin-bottom: 25px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat .label {
+    font-size: 11px;
+    color: #8fd9ac;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .stat .value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffd700;
+  }
+
+  .table {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(0,0,0,0.15);
+    border: 2px solid rgba(255,215,0,0.25);
+    border-radius: 20px;
+    padding: 25px;
+  }
+
+  .hand-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #8fd9ac;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .score-badge {
+    background: rgba(255,215,0,0.15);
+    color: #ffd700;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
   .cards {
     display: flex;
-    gap: 8px;
-    min-height: 100px;
+    gap: 10px;
+    min-height: 110px;
     flex-wrap: wrap;
-    justify-content: center;
+    margin-bottom: 25px;
   }
+
   .card {
-    width: 65px;
-    height: 95px;
-    background: #fff;
-    color: #000;
-    border-radius: 8px;
+    width: 68px;
+    height: 96px;
+    background: linear-gradient(160deg, #ffffff, #f0f0f0);
+    color: #1a1a1a;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 20px;
-    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    font-weight: 700;
+    font-size: 22px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,0,0,0.1);
+    animation: deal 0.35s ease-out;
   }
+
+  @keyframes deal {
+    from { transform: translateY(-30px) scale(0.8); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
   .card.red { color: #d40000; }
+
+  .card .suit { font-size: 24px; margin-top: 2px; }
+
   .card.hidden {
-    background: repeating-linear-gradient(45deg, #333, #333 5px, #444 5px, #444 10px);
+    background: repeating-linear-gradient(45deg, #7a1f2b, #7a1f2b 6px, #5c1620 6px, #5c1620 12px);
+    border: 2px solid #ffd700;
   }
-  .controls { margin-top: 25px; display: flex; gap: 12px; }
-  button {
-    padding: 12px 24px;
-    font-size: 16px;
-    background: #ffd038;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  button:disabled { background: #777; cursor: not-allowed; }
+
   #message {
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 20px;
-    min-height: 32px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    min-height: 30px;
+    margin-bottom: 15px;
   }
-  #chips { font-size: 18px; margin-top: 10px; }
+
+  #message.win { color: #4ade80; }
+  #message.lose { color: #f87171; }
+  #message.push { color: #facc15; }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 12px 26px;
+    font-size: 15px;
+    font-weight: 600;
+    background: linear-gradient(160deg, #ffd700, #d4a900);
+    color: #1a1a1a;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  }
+
+  button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0,0,0,0.5);
+  }
+
+  button:disabled {
+    background: #444;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  button.secondary {
+    background: transparent;
+    color: #ffd700;
+    border: 1.5px solid #ffd700;
+  }
+
+  #gameOverBanner {
+    display: none;
+    text-align: center;
+    color: #f87171;
+    font-size: 16px;
+    margin-top: 15px;
+  }
 </style>
 </head>
 <body>
 
-<h1>Blackjack</h1>
-<div id="chips">Chips: 500</div>
+<h1>♠ Blackjack ♥</h1>
+<div class="subtitle">Einsatz pro Runde: 50 Chips</div>
 
-<div class="hand-label">Dealer</div>
-<div class="cards" id="dealerCards"></div>
-<div class="info" id="dealerScore"></div>
+<div class="top-bar">
+  <div class="stat">
+    <div class="label">Chips</div>
+    <div class="value" id="chipsVal">1000</div>
+  </div>
+  <div class="stat">
+    <div class="label">Einsatz</div>
+    <div class="value" id="betVal">50</div>
+  </div>
+</div>
 
-<div class="hand-label">Du</div>
-<div class="cards" id="playerCards"></div>
-<div class="info" id="playerScore"></div>
+<div class="table">
+  <div class="hand-label">Dealer <span class="score-badge" id="dealerScore">?</span></div>
+  <div class="cards" id="dealerCards"></div>
 
-<div id="message"></div>
+  <div class="hand-label">Du <span class="score-badge" id="playerScore">0</span></div>
+  <div class="cards" id="playerCards"></div>
 
-<div class="controls">
-  <button id="hitBtn">Hit</button>
-  <button id="standBtn">Stand</button>
-  <button id="newBtn">Neues Spiel</button>
+  <div id="message"></div>
+
+  <div class="controls">
+    <button id="hitBtn">Hit</button>
+    <button id="standBtn">Stand</button>
+    <button id="newBtn" class="secondary">Neue Runde</button>
+  </div>
+
+  <div id="gameOverBanner">Keine Chips mehr! Neue Runde startet mit 1000 Chips neu.</div>
 </div>
 
 <script>
+const BET = 50;
 let deck = [];
 let playerHand = [];
 let dealerHand = [];
-let chips = 500;
+let chips = 1000;
 let gameOver = false;
 
 const suits = ["♠", "♥", "♦", "♣"];
@@ -102,7 +243,6 @@ function buildDeck() {
       deck.push({ value: v, suit: s });
     }
   }
-  // shuffle
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -131,7 +271,7 @@ function renderCard(card, hidden = false) {
   if (hidden) {
     div.classList.add("hidden");
   } else {
-    div.innerHTML = card.value + "<br>" + card.suit;
+    div.innerHTML = card.value + '<span class="suit">' + card.suit + '</span>';
   }
   return div;
 }
@@ -147,21 +287,34 @@ function render(revealDealer = false) {
   });
   playerHand.forEach(c => playerDiv.appendChild(renderCard(c)));
 
-  document.getElementById("playerScore").textContent = "Punkte: " + handScore(playerHand);
+  document.getElementById("playerScore").textContent = handScore(playerHand);
   document.getElementById("dealerScore").textContent = revealDealer
-    ? "Punkte: " + handScore(dealerHand)
-    : "Punkte: " + cardValue(dealerHand[0]) + " + ?";
+    ? handScore(dealerHand)
+    : cardValue(dealerHand[0]) + " + ?";
 
-  document.getElementById("chips").textContent = "Chips: " + chips;
+  document.getElementById("chipsVal").textContent = chips;
+  document.getElementById("betVal").textContent = BET;
+}
+
+function setMessage(text, cls) {
+  const el = document.getElementById("message");
+  el.textContent = text;
+  el.className = cls || "";
 }
 
 function startGame() {
-  if (chips <= 0) chips = 500;
+  const banner = document.getElementById("gameOverBanner");
+  if (chips < BET) {
+    chips = 1000;
+    banner.style.display = "block";
+    setTimeout(() => banner.style.display = "none", 3000);
+  }
+  chips -= BET;
   buildDeck();
   playerHand = [deck.pop(), deck.pop()];
   dealerHand = [deck.pop(), deck.pop()];
   gameOver = false;
-  document.getElementById("message").textContent = "";
+  setMessage("");
   document.getElementById("hitBtn").disabled = false;
   document.getElementById("standBtn").disabled = false;
   render(false);
@@ -199,23 +352,21 @@ function endGame(result) {
   document.getElementById("standBtn").disabled = true;
   render(true);
 
-  const msg = document.getElementById("message");
   if (result === "blackjack") {
-    msg.textContent = "Blackjack! Du gewinnst!";
-    chips += 75;
+    chips += BET + Math.floor(BET * 1.5);
+    setMessage("Blackjack! +" + Math.floor(BET * 1.5) + " Chips", "win");
   } else if (result === "bust") {
-    msg.textContent = "Bust! Du verlierst.";
-    chips -= 50;
+    setMessage("Bust! -" + BET + " Chips", "lose");
   } else if (result === "win") {
-    msg.textContent = "Du gewinnst!";
-    chips += 50;
+    chips += BET * 2;
+    setMessage("Gewonnen! +" + BET + " Chips", "win");
   } else if (result === "lose") {
-    msg.textContent = "Dealer gewinnt.";
-    chips -= 50;
+    setMessage("Dealer gewinnt. -" + BET + " Chips", "lose");
   } else if (result === "push") {
-    msg.textContent = "Unentschieden.";
+    chips += BET;
+    setMessage("Unentschieden. Einsatz zurück.", "push");
   }
-  document.getElementById("chips").textContent = "Chips: " + chips;
+  document.getElementById("chipsVal").textContent = chips;
 }
 
 document.getElementById("hitBtn").addEventListener("click", hit);
