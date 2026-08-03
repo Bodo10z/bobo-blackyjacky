@@ -346,6 +346,75 @@
   }
   .paytable b{ color: var(--gold-bright); }
 
+  /* ---------- Coin Flip ---------- */
+  .coin-stage{ display:flex; justify-content:center; margin: 10px 0 20px; perspective: 800px; }
+  .coin{
+    width: 120px; height:120px; position: relative; transform-style: preserve-3d;
+    transition: transform 1.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .coin-face{
+    position:absolute; inset:0; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Playfair Display',serif; font-weight:900; font-size:2.6rem; color: var(--ink);
+    background: radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 65%, #8a6d1d 100%);
+    border: 3px solid #8a6d1d; backface-visibility: hidden;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+  }
+  .coin-back{ transform: rotateY(180deg); }
+  .coin.flip-heads{ transform: rotateY(1440deg); }
+  .coin.flip-tails{ transform: rotateY(1620deg); }
+
+  /* ---------- Fischfang Deluxe ---------- */
+  .bf-meter-wrap{
+    text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.78rem;
+    color: var(--gold-bright); background: var(--ink); border:1px solid var(--gold);
+    border-radius: 8px; padding: 8px; margin-bottom: 14px;
+  }
+  .bf-grid{
+    display:grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap: 6px; background: var(--ink); border: 3px solid var(--gold); border-radius: 14px;
+    padding: 10px; margin-bottom: 6px;
+  }
+  .bf-cell{
+    aspect-ratio: 1; background: var(--cream); border-radius: 8px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    font-size: 1.8rem; position: relative; border: 1px solid #8a6d1d;
+    animation: bf-drop 0.3s ease;
+  }
+  .bf-cell.wild{ background: linear-gradient(160deg, var(--gold-bright), var(--gold)); }
+  .bf-cell.money-val{
+    position:absolute; bottom:2px; font-family:'JetBrains Mono',monospace; font-size:0.55rem;
+    font-weight:700; color: var(--wine-bright); background: rgba(255,255,255,0.85);
+    border-radius: 4px; padding: 0 3px;
+  }
+  .bf-cell.collected{ outline: 3px solid var(--wine-bright); }
+  @keyframes bf-drop{ from{ transform: translateY(-16px); opacity:0.4; } to{ transform:none; opacity:1; } }
+
+  /* ---------- Penguin Ice Jump ---------- */
+  .pg-track-wrap{
+    overflow-x:auto; padding: 10px 0 18px; margin-bottom: 6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 40%),
+      repeating-linear-gradient(180deg, #0b3550 0 8px, #0a2e46 8px 16px);
+    border-radius: 12px;
+  }
+  .pg-track{ display:flex; align-items:flex-end; gap: 14px; padding: 10px 18px; min-width: max-content; }
+  .pg-floe{
+    width: 54px; height: 40px; border-radius: 50% 50% 45% 45%/60% 60% 40% 40%;
+    background: linear-gradient(180deg, #eaf6fb, #cfe9f2);
+    border: 2px solid #a9d3e0; position: relative; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#2b5266; font-weight:700;
+  }
+  .pg-floe.done{ border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.6); }
+  .pg-floe.current .pg-penguin{ display:block; }
+  .pg-penguin{
+    display:none; position:absolute; top:-28px; left:50%; transform: translateX(-50%);
+    font-size: 1.8rem; animation: pg-bounce 0.6s ease infinite alternate;
+  }
+  @keyframes pg-bounce{ from{ transform: translateX(-50%) translateY(0);} to{ transform: translateX(-50%) translateY(-6px);} }
+  .pg-floe.fallen{ opacity: 0.3; }
+  .pg-stat-row{ display:flex; justify-content:center; gap: 14px; margin: 8px 0 4px; flex-wrap:wrap; }
+
   footer.note{
     margin-top: 34px; font-family:'JetBrains Mono',monospace; font-size:0.68rem;
     color: rgba(237,230,214,0.4); text-align:center; max-width: 500px;
@@ -398,6 +467,24 @@
         <span class="game-icon icon-reel">🎰</span>
         <h3>Slots</h3>
         <p>Drei Walzen, klare Gewinnlinien, echte Quoten.</p>
+        <span class="card-cta">Spielen</span>
+      </div>
+      <div class="game-card" data-game="coinflip">
+        <span class="game-icon icon-coin">🪙</span>
+        <h3>Münzwurf</h3>
+        <p>Kopf oder Zahl. Einfach, ehrlich, 50/50.</p>
+        <span class="card-cta">Spielen</span>
+      </div>
+      <div class="game-card" data-game="bigfish">
+        <span class="game-icon icon-reel">🎣</span>
+        <h3>Fischfang Deluxe</h3>
+        <p>5 Walzen, Freispiele, Geldfische und Multiplikatoren.</p>
+        <span class="card-cta">Spielen</span>
+      </div>
+      <div class="game-card" data-game="penguin">
+        <span class="game-icon icon-wheel">🐧</span>
+        <h3>Pinguin Sprung</h3>
+        <p>Eisscholle für Eisscholle weiter — oder auszahlen, bevor es ins Wasser geht.</p>
         <span class="card-cta">Spielen</span>
       </div>
     </div>
@@ -516,6 +603,107 @@
   </div>
 </section>
 
+<!-- COIN FLIP -->
+<section class="screen" id="screen-coinflip">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" data-back>← Menü</button>
+      <span class="logo-small">Münzwurf</span>
+    </div>
+    <div class="balance" id="balanceCF"><span class="chip-icon"></span><span id="balanceCFVal">1.000</span></div>
+  </div>
+  <div class="table-wrap" style="max-width:460px;">
+    <div class="coin-stage">
+      <div class="coin" id="coinEl">
+        <div class="coin-face coin-front">K</div>
+        <div class="coin-face coin-back">Z</div>
+      </div>
+    </div>
+    <div class="msg" id="cfMsg">Wähl Kopf oder Zahl, setz deinen Einsatz.</div>
+    <div class="controls" style="margin-bottom:6px;">
+      <button class="btn" id="cfPickHead">Kopf</button>
+      <button class="btn" id="cfPickTail">Zahl</button>
+    </div>
+    <div class="bet-row" id="cfBetRow">
+      <div class="bet-display">Einsatz: <span id="cfBetVal">10</span></div>
+      <button class="chip-btn" data-chip="10">+10</button>
+      <button class="chip-btn" data-chip="50">+50</button>
+      <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn" data-chip="clear">✕</button>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="cfFlip">Werfen</button>
+    </div>
+    <div class="paytable">Richtig getippt = <b>2x</b> Einsatz zurück.</div>
+  </div>
+</section>
+
+<!-- BIG FISH SLOT -->
+<section class="screen" id="screen-bigfish">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" data-back>← Menü</button>
+      <span class="logo-small">Fischfang Deluxe</span>
+    </div>
+    <div class="balance" id="balanceBF"><span class="chip-icon"></span><span id="balanceBFVal">1.000</span></div>
+  </div>
+  <div class="table-wrap" style="max-width:640px;">
+    <div class="bf-meter-wrap" id="bfMeterWrap" style="display:none;">
+      <div class="bf-meter-label">Freispiele: <span id="bfSpinsLeft">0</span> · Wild-Zähler: <span id="bfWildCount">0</span>/4 · Multi: <span id="bfMulti">2x</span></div>
+    </div>
+    <div class="bf-grid" id="bfGrid"></div>
+    <div class="msg" id="bfMsg">Einsatz wählen und Walzen drehen.</div>
+    <div class="bet-row" id="bfBetRow">
+      <div class="bet-display">Einsatz: <span id="bfBetVal">10</span></div>
+      <button class="chip-btn" data-chip="10">+10</button>
+      <button class="chip-btn" data-chip="50">+50</button>
+      <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn" data-chip="clear">✕</button>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="bfSpin">Drehen</button>
+    </div>
+    <div class="paytable">
+      🪝🪝🪝 (3+) = Freispiele (10/15/20) &nbsp;·&nbsp; 🎣 Angler ist Wild<br>
+      💰 Geldfisch zeigt eigenen Wert — im Freispiel sammelt der Wild-Angler alle 💰 gleichzeitig ein<br>
+      Jeder 4. gesammelte Wild = +10 Freispiele & höherer Multiplikator (2x → 3x → 10x)
+    </div>
+  </div>
+</section>
+
+<!-- PENGUIN ICE JUMP -->
+<section class="screen" id="screen-penguin">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" data-back>← Menü</button>
+      <span class="logo-small">Pinguin Sprung</span>
+    </div>
+    <div class="balance" id="balancePG"><span class="chip-icon"></span><span id="balancePGVal">1.000</span></div>
+  </div>
+  <div class="table-wrap" style="max-width:720px;">
+    <div class="pg-track-wrap">
+      <div class="pg-track" id="pgTrack"></div>
+    </div>
+    <div class="msg" id="pgMsg">Einsatz setzen und losspringen.</div>
+    <div class="pg-stat-row">
+      <div class="bet-display">Multi: <span id="pgMulti">1.00x</span></div>
+      <div class="bet-display">Möglicher Gewinn: <span id="pgPotential">0</span></div>
+    </div>
+    <div class="bet-row" id="pgBetRow">
+      <div class="bet-display">Einsatz: <span id="pgBetVal">10</span></div>
+      <button class="chip-btn" data-chip="10">+10</button>
+      <button class="chip-btn" data-chip="50">+50</button>
+      <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn" data-chip="clear">✕</button>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="pgStart">Start</button>
+      <button class="btn" id="pgJump" disabled>Weiter hüpfen</button>
+      <button class="btn danger" id="pgCashout" disabled>Auszahlen</button>
+    </div>
+  </div>
+</section>
+
 <script>
 (function(){
   "use strict";
@@ -527,12 +715,18 @@
     bj: document.getElementById('balanceBJVal'),
     rl: document.getElementById('balanceRLVal'),
     sl: document.getElementById('balanceSLVal'),
+    cf: document.getElementById('balanceCFVal'),
+    bf: document.getElementById('balanceBFVal'),
+    pg: document.getElementById('balancePGVal'),
   };
   const balWraps = {
     menu: document.getElementById('balanceMenu'),
     bj: document.getElementById('balanceBJ'),
     rl: document.getElementById('balanceRL'),
     sl: document.getElementById('balanceSL'),
+    cf: document.getElementById('balanceCF'),
+    bf: document.getElementById('balanceBF'),
+    pg: document.getElementById('balancePG'),
   };
   function fmt(n){ return n.toLocaleString('de-DE'); }
   function renderBalance(flash){
@@ -913,6 +1107,377 @@
       if(win > 0) changeBalance(win);
       spinBtn.disabled = false;
     }
+  })();
+
+  /* ============================================================
+     COIN FLIP
+  ============================================================ */
+  (function CoinFlip(){
+    const coinEl = document.getElementById('coinEl');
+    const msgEl = document.getElementById('cfMsg');
+    const betValEl = document.getElementById('cfBetVal');
+    const betRow = document.getElementById('cfBetRow');
+    const flipBtn = document.getElementById('cfFlip');
+    const pickHeadBtn = document.getElementById('cfPickHead');
+    const pickTailBtn = document.getElementById('cfPickTail');
+
+    let bet = 10, pick = 'heads';
+    betValEl.textContent = fmt(bet);
+    wireChipButtons(betRow, () => bet, v => bet = v, v => { betValEl.textContent = fmt(v || 0); });
+
+    function setPick(p){
+      pick = p;
+      pickHeadBtn.classList.toggle('primary', p==='heads');
+      pickTailBtn.classList.toggle('primary', p==='tails');
+    }
+    setPick('heads');
+    pickHeadBtn.addEventListener('click', () => setPick('heads'));
+    pickTailBtn.addEventListener('click', () => setPick('tails'));
+
+    flipBtn.addEventListener('click', () => {
+      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
+      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+      changeBalance(-bet);
+      flipBtn.disabled = true; pickHeadBtn.disabled = true; pickTailBtn.disabled = true;
+      betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=true);
+
+      const result = Math.random() < 0.5 ? 'heads' : 'tails';
+      coinEl.className = 'coin ' + (result === 'heads' ? 'flip-heads' : 'flip-tails');
+      msgEl.textContent = 'Die Münze dreht sich…';
+
+      setTimeout(() => {
+        const win = result === pick;
+        if(win){
+          const payout = bet*2;
+          changeBalance(payout);
+          msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Gewonnen! +${fmt(payout)}`;
+        }else{
+          msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Verloren.`;
+        }
+        flipBtn.disabled = false; pickHeadBtn.disabled = false; pickTailBtn.disabled = false;
+        betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=false);
+      }, 1450);
+    });
+  })();
+
+  /* ============================================================
+     FISCHFANG DELUXE (inspired by classic "money fish" slot mechanics:
+     5x3 reels, scatter-triggered free spins, wild collects money-fish
+     values, every 4th wild retriggers +10 spins & raises multiplier)
+  ============================================================ */
+  (function BigFishSlot(){
+    const LOW = ['9','10','J','Q','K','A'];
+    const LOW_PAY = { '9':2, '10':2, 'J':3, 'Q':3, 'K':4, 'A':5 }; // per 3-match, scales x for 4/5
+    const FISH = '🐟', CRAB = '🦀';
+    const SCATTER = '🪝';
+    const WILD = '🎣';
+    const MONEY = '💰';
+    const MONEY_VALUES = [2,5,10,15,25,50,200]; // xBet, capped down from the real game's 2000x for balance
+
+    const gridEl = document.getElementById('bfGrid');
+    const msgEl = document.getElementById('bfMsg');
+    const betValEl = document.getElementById('bfBetVal');
+    const betRow = document.getElementById('bfBetRow');
+    const spinBtn = document.getElementById('bfSpin');
+    const meterWrap = document.getElementById('bfMeterWrap');
+    const spinsLeftEl = document.getElementById('bfSpinsLeft');
+    const wildCountEl = document.getElementById('bfWildCount');
+    const multiEl = document.getElementById('bfMulti');
+
+    let bet = 10;
+    betValEl.textContent = fmt(bet);
+    wireChipButtons(betRow, () => bet, v => bet = v, v => { betValEl.textContent = fmt(v || 0); });
+
+    // paylines: row index (0=top,1=mid,2=bottom) per reel, 5 reels
+    const PAYLINES = [
+      [1,1,1,1,1],
+      [0,0,0,0,0],
+      [2,2,2,2,2],
+      [0,1,2,1,0],
+      [2,1,0,1,2],
+    ];
+
+    let inFreeSpins = false, spinsLeft = 0, wildsCollected = 0, freeSpinMulti = 2, freeSpinTotalWin = 0;
+
+    function weightedSymbol(){
+      // base-game weights: low pays common, fish/crab less common, scatter rare, wild only in free spins by default (small base chance too)
+      const r = Math.random();
+      if(r < 0.03) return SCATTER;
+      if(inFreeSpins && r < 0.09) return WILD;
+      if(!inFreeSpins && r < 0.05) return WILD;
+      if(inFreeSpins && r < 0.22) return MONEY;
+      if(r < 0.30) return FISH;
+      if(r < 0.36) return CRAB;
+      return LOW[Math.floor(Math.random()*LOW.length)];
+    }
+
+    function buildGrid(){
+      const grid = [];
+      for(let reel=0; reel<5; reel++){
+        const col = [];
+        for(let row=0; row<3; row++) col.push(weightedSymbol());
+        grid.push(col);
+      }
+      return grid;
+    }
+
+    function renderGrid(grid, moneyVals, collected){
+      gridEl.innerHTML = '';
+      // render row by row for correct visual grid order
+      for(let row=0; row<3; row++){
+        for(let reel=0; reel<5; reel++){
+          const sym = grid[reel][row];
+          const cell = document.createElement('div');
+          cell.className = 'bf-cell' + (sym===WILD ? ' wild' : '');
+          cell.textContent = sym;
+          if(sym === MONEY){
+            const tag = document.createElement('div');
+            tag.className = 'bf-cell money-val';
+            tag.textContent = moneyVals[reel+'_'+row] + 'x';
+            cell.appendChild(tag);
+          }
+          if(collected && collected.has(reel+'_'+row)) cell.classList.add('collected');
+          gridEl.appendChild(cell);
+        }
+      }
+    }
+
+    function payForSymbol(sym, count){
+      if(sym === MONEY || sym === SCATTER) return 0;
+      let base;
+      if(LOW.includes(sym)) base = LOW_PAY[sym];
+      else if(sym === FISH) base = 8;
+      else if(sym === CRAB) base = 12;
+      else base = 0;
+      if(count === 3) return base;
+      if(count === 4) return base*3;
+      if(count === 5) return base*10;
+      return 0;
+    }
+
+    function evaluateLines(grid){
+      let total = 0;
+      for(const line of PAYLINES){
+        const symbols = line.map((row,reel) => grid[reel][row]);
+        // find leading symbol (first non-wild, or wild if all wild)
+        let lead = symbols.find(s => s !== WILD);
+        if(!lead) lead = WILD;
+        if(lead === SCATTER || lead === MONEY) continue;
+        let count = 0;
+        for(const s of symbols){
+          if(s === lead || s === WILD) count++; else break;
+        }
+        if(count >= 3) total += payForSymbol(lead, count) * (bet/10);
+      }
+      return total;
+    }
+
+    function countScatters(grid){
+      let n = 0;
+      for(let reel=0; reel<5; reel++) for(let row=0; row<3; row++) if(grid[reel][row]===SCATTER) n++;
+      return n;
+    }
+
+    function assignMoneyValues(grid){
+      const vals = {};
+      for(let reel=0; reel<5; reel++) for(let row=0; row<3; row++){
+        if(grid[reel][row] === MONEY){
+          vals[reel+'_'+row] = MONEY_VALUES[Math.floor(Math.random()*MONEY_VALUES.length)];
+        }
+      }
+      return vals;
+    }
+
+    function updateMeter(){
+      meterWrap.style.display = inFreeSpins ? 'block' : 'none';
+      spinsLeftEl.textContent = spinsLeft;
+      wildCountEl.textContent = wildsCollected % 4;
+      multiEl.textContent = freeSpinMulti + 'x';
+    }
+
+    function doSpin(auto){
+      if(!inFreeSpins){
+        if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
+        if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+        changeBalance(-bet);
+      }
+      spinBtn.disabled = true;
+      betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=true);
+      msgEl.textContent = 'Walzen drehen…';
+
+      setTimeout(() => {
+        const grid = buildGrid();
+        const moneyVals = assignMoneyValues(grid);
+        let lineWin = evaluateLines(grid);
+        let moneyWin = 0;
+        const collected = new Set();
+
+        if(inFreeSpins){
+          // does a wild appear together with money fish this spin?
+          let wildPresent = false;
+          for(let reel=0; reel<5; reel++) for(let row=0; row<3; row++) if(grid[reel][row]===WILD) wildPresent = true;
+          if(wildPresent){
+            wildsCollected++;
+            for(const key in moneyVals){
+              moneyWin += moneyVals[key] * (bet/10) * freeSpinMulti;
+              collected.add(key);
+            }
+            if(wildsCollected % 4 === 0){
+              spinsLeft += 10;
+              freeSpinMulti = freeSpinMulti === 2 ? 3 : (freeSpinMulti === 3 ? 10 : 10);
+            }
+          }
+        }
+
+        renderGrid(grid, moneyVals, collected);
+
+        const scatterCount = countScatters(grid);
+        let scatterMsg = '';
+        if(!inFreeSpins && scatterCount >= 3){
+          inFreeSpins = true;
+          spinsLeft = scatterCount === 3 ? 10 : (scatterCount === 4 ? 15 : 20);
+          wildsCollected = 0; freeSpinMulti = 2; freeSpinTotalWin = 0;
+          scatterMsg = ` 🪝×${scatterCount} — ${spinsLeft} Freispiele gestartet!`;
+        }
+
+        const spinWin = lineWin + moneyWin;
+        if(inFreeSpins) freeSpinTotalWin += spinWin;
+        if(spinWin > 0) changeBalance(spinWin);
+
+        if(inFreeSpins){
+          spinsLeft--;
+          updateMeter();
+          if(spinsLeft <= 0){
+            inFreeSpins = false;
+            msgEl.textContent = `Freispiele beendet. Gesamtgewinn: +${fmt(freeSpinTotalWin)}${scatterMsg}`;
+            updateMeter();
+          } else {
+            msgEl.textContent = (spinWin > 0 ? `+${fmt(spinWin)}` : 'Kein Treffer') + scatterMsg + ` — noch ${spinsLeft} Freispiele`;
+          }
+        } else {
+          msgEl.textContent = spinWin > 0 ? `Gewonnen! +${fmt(spinWin)}${scatterMsg}` : ('Kein Treffer.' + scatterMsg);
+        }
+
+        spinBtn.disabled = false;
+        betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=false);
+
+        if(inFreeSpins && spinsLeft > 0){
+          setTimeout(() => doSpin(true), 900);
+          spinBtn.disabled = true;
+        }
+      }, 550);
+    }
+
+    updateMeter();
+    spinBtn.addEventListener('click', () => doSpin(false));
+  })();
+
+  /* ============================================================
+     PENGUIN ICE JUMP (step-based risk ladder: press "weiter" to
+     advance one ice floe further for a bigger multiplier, cash out
+     anytime, or fall into the water and lose the stake)
+  ============================================================ */
+  (function PenguinJump(){
+    const SURVIVAL = [0, .90,.87,.84,.81,.78,.75,.72,.69,.66,.63]; // index by step 1..10
+    const MULT = [0]; // build cumulative, ~house edge baked in
+    for(let i=1;i<=10;i++){
+      const prev = MULT[i-1] || 1;
+      MULT[i] = +(prev / SURVIVAL[i] * 0.97).toFixed(4);
+    }
+
+    const trackEl = document.getElementById('pgTrack');
+    const msgEl = document.getElementById('pgMsg');
+    const multiEl = document.getElementById('pgMulti');
+    const potentialEl = document.getElementById('pgPotential');
+    const betValEl = document.getElementById('pgBetVal');
+    const betRow = document.getElementById('pgBetRow');
+    const startBtn = document.getElementById('pgStart');
+    const jumpBtn = document.getElementById('pgJump');
+    const cashoutBtn = document.getElementById('pgCashout');
+
+    let bet = 10, step = 0, active = false;
+    betValEl.textContent = fmt(bet);
+    wireChipButtons(betRow, () => bet, v => bet = v, v => { betValEl.textContent = fmt(v || 0); });
+
+    function buildTrack(){
+      trackEl.innerHTML = '';
+      for(let i=0;i<=10;i++){
+        const floe = document.createElement('div');
+        floe.className = 'pg-floe';
+        floe.dataset.i = i;
+        floe.innerHTML = i===0 ? 'Start' : ('x' + MULT[i].toFixed(2));
+        const pen = document.createElement('span');
+        pen.className = 'pg-penguin';
+        pen.textContent = '🐧';
+        floe.appendChild(pen);
+        trackEl.appendChild(floe);
+      }
+    }
+    buildTrack();
+
+    function updateTrackVisual(){
+      trackEl.querySelectorAll('.pg-floe').forEach(f => {
+        const i = parseInt(f.dataset.i,10);
+        f.classList.toggle('current', i === step);
+        f.classList.toggle('done', i < step);
+      });
+      const cur = trackEl.querySelector(`.pg-floe[data-i="${step}"]`);
+      if(cur) cur.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+    }
+
+    function currentMulti(){ return step === 0 ? 1 : MULT[step]; }
+    function refreshStats(){
+      multiEl.textContent = currentMulti().toFixed(2) + 'x';
+      potentialEl.textContent = fmt(Math.floor(bet * currentMulti()));
+    }
+
+    startBtn.addEventListener('click', () => {
+      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
+      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+      changeBalance(-bet);
+      active = true; step = 0;
+      buildTrack(); updateTrackVisual(); refreshStats();
+      msgEl.textContent = 'Der Pinguin steht bereit. Los geht’s!';
+      startBtn.disabled = true; jumpBtn.disabled = false; cashoutBtn.disabled = true;
+      betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=true);
+    });
+
+    jumpBtn.addEventListener('click', () => {
+      if(!active) return;
+      const nextStep = step + 1;
+      const survive = Math.random() < SURVIVAL[nextStep];
+      if(survive){
+        step = nextStep;
+        updateTrackVisual(); refreshStats();
+        cashoutBtn.disabled = false;
+        if(step >= 10){
+          msgEl.textContent = `Letzte Eisscholle erreicht! Auto-Auszahlung bei ${MULT[10].toFixed(2)}x.`;
+          endRound(true);
+        } else {
+          msgEl.textContent = `Geschafft! Eisscholle ${step} von 10.`;
+        }
+      } else {
+        const floe = trackEl.querySelector(`.pg-floe[data-i="${nextStep}"]`);
+        if(floe) floe.classList.add('fallen');
+        msgEl.textContent = 'Ins Wasser gefallen — Einsatz verloren.';
+        endRound(false);
+      }
+    });
+
+    cashoutBtn.addEventListener('click', () => { if(active) endRound(true); });
+
+    function endRound(win){
+      active = false;
+      jumpBtn.disabled = true; cashoutBtn.disabled = true; startBtn.disabled = false;
+      betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=false);
+      if(win && step > 0){
+        const payout = Math.floor(bet * currentMulti());
+        changeBalance(payout);
+        msgEl.textContent = `Ausgezahlt bei ${currentMulti().toFixed(2)}x — +${fmt(payout)}`;
+      }
+    }
+
+    refreshStats();
   })();
 
 })();
