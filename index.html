@@ -348,8 +348,8 @@
   }
   .reel{
     width: 84px; height: 84px; overflow:hidden; background: var(--cream);
-    border-radius: 10px; display:flex; align-items:center; justify-content:center;
-    font-size: 2.6rem; border: 2px solid #8a6d1d;
+    border-radius: 10px; position: relative;
+    font-size: 2.6rem; border: 2px solid #8a6d1d; color: var(--ink);
   }
   .reel.spinning{ animation: reel-spin 0.12s linear infinite; }
   @keyframes reel-spin{
@@ -394,7 +394,8 @@
     aspect-ratio: 1; background: var(--cream); border-radius: 8px;
     display:flex; align-items:center; justify-content:center; flex-direction:column;
     font-size: 1.8rem; position: relative; border: 1px solid #8a6d1d;
-    animation: bf-drop 0.3s ease;
+    animation: bf-drop 0.3s ease; color: var(--ink); font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
   }
   .bf-cell.wild{ background: linear-gradient(160deg, var(--gold-bright), var(--gold)); }
   .bf-cell.money-val{
@@ -431,10 +432,9 @@
   .pg-stat-row{ display:flex; justify-content:center; gap: 14px; margin: 8px 0 4px; flex-wrap:wrap; }
 
   /* ---------- Reel strip animation (Slots) ---------- */
-  .reel{ position: relative; overflow: hidden; }
   .reel.win-glow{ box-shadow: 0 0 0 3px var(--gold-bright), 0 0 26px 8px rgba(244,209,96,0.7); }
-  .reel-strip{ display:flex; flex-direction:column; will-change: transform; }
-  .reel-strip .sym{ width: 84px; height: 84px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; flex-shrink:0; }
+  .reel-strip{ display:flex; flex-direction:column; will-change: transform; position:absolute; top:0; left:0; width:100%; }
+  .reel-strip .sym{ width: 84px; height: 84px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; flex-shrink:0; color: var(--ink); }
   .reel-strip.spin{ animation: reel-scroll 0.18s linear infinite; filter: blur(1.5px); }
   @keyframes reel-scroll{ from{ transform: translateY(0);} to{ transform: translateY(-84px);} }
   .reel-strip.settle{ transition: transform 0.6s cubic-bezier(.2,.9,.25,1.4); filter:none; }
