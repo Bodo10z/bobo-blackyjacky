@@ -812,6 +812,9 @@
   }
   .shop-item-row .shop-icon{ font-size: 1.5rem; width: 30px; text-align:center; position:relative; z-index:1; }
   .shop-item-row .shop-name{ flex:1; font-size: 0.85rem; position:relative; z-index:1; }
+  .shop-combat-stat{
+    font-family:'JetBrains Mono',monospace; font-size: 0.68rem; color: #7ec98f; margin-top: 2px;
+  }
   .shop-item-row .shop-rare-tag{
     font-family:'JetBrains Mono',monospace; font-size: 0.55rem; color: #6ea8ff;
     border: 1px solid #6ea8ff; border-radius: 4px; padding: 1px 5px; margin-left: 4px;
@@ -829,6 +832,110 @@
   .shop-buy-btn:hover:not(:disabled){ transform: scale(1.06); }
   .shop-buy-btn:disabled{ background: rgba(255,255,255,0.1); color: rgba(237,230,214,0.4); cursor:default; }
   .shop-buy-btn.owned{ background: transparent; border: 1px solid var(--gold); color: var(--gold-bright); }
+
+  /* ---------- CHALLENGE HUD (floating timer + boss button) ---------- */
+  .challenge-hud{
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 45;
+    display: none; align-items: center; gap: 12px;
+    background: var(--ink); border: 1px solid var(--wine-bright); border-radius: 999px;
+    padding: 8px 10px 8px 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  }
+  .challenge-hud.visible{ display: flex; }
+  .challenge-hud-timer{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size: 0.95rem; color: var(--gold-bright);
+  }
+  .challenge-hud-timer.urgent{ color: var(--wine-bright); animation: hud-urgent-pulse 0.8s ease-in-out infinite; }
+  @keyframes hud-urgent-pulse{ 0%,100%{ opacity:1;} 50%{ opacity:0.4;} }
+  .challenge-hud-btn{
+    font-family:'JetBrains Mono',monospace; font-size: 0.72rem; font-weight:700; padding: 7px 14px;
+    border-radius: 999px; border: none; cursor: pointer; background: var(--wine-bright); color: var(--cream);
+  }
+  .challenge-hud-btn:hover{ background: #c23347; }
+
+  /* ---------- BOSS FIGHT ---------- */
+  .bf-vs-row{ margin: 6px 0; }
+  .bf-combatant{ max-width: 420px; margin: 0 auto; }
+  .bf-hp-label{
+    font-family:'JetBrains Mono',monospace; font-size: 0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+    color: var(--gold); margin-bottom: 4px;
+  }
+  .bf-hp-bar{
+    width: 100%; height: 16px; border-radius: 999px; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line); overflow: hidden;
+  }
+  .bf-hp-fill{ height: 100%; width: 100%; border-radius: 999px; transition: width 0.5s cubic-bezier(.2,.8,.25,1); }
+  .boss-fill{ background: linear-gradient(90deg, var(--wine-bright), var(--wine)); }
+  .player-fill{ background: linear-gradient(90deg, var(--gold-bright), var(--gold)); }
+  .bf-hp-text{ font-family:'JetBrains Mono',monospace; font-size: 0.7rem; color: rgba(237,230,214,0.6); margin-top: 3px; text-align:right; }
+  .boss-visual{
+    font-size: 5.5rem; text-align:center; margin: 14px 0; filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5));
+    animation: boss-idle 2.6s ease-in-out infinite;
+  }
+  @keyframes boss-idle{ 0%,100%{ transform: translateY(0) scale(1);} 50%{ transform: translateY(-6px) scale(1.02);} }
+  .boss-visual.theme-green{ filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(60,180,100,0.5)); }
+  .boss-visual.theme-amber{ filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(230,160,40,0.5)); }
+  .boss-visual.theme-red{ filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(200,40,60,0.6)); }
+  .boss-visual.theme-black{ filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 24px rgba(212,175,55,0.7)); }
+  .boss-visual.hit{ animation: boss-hit-shake 0.35s ease; }
+  @keyframes boss-hit-shake{
+    0%,100%{ transform: translateX(0); filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5)) brightness(1);}
+    30%{ transform: translateX(-10px); filter: drop-shadow(0 10px 14px rgba(0,0,0,0.5)) brightness(2) saturate(3);}
+    60%{ transform: translateX(8px);}
+  }
+  .attack-choice{ display:flex; justify-content:center; gap: 10px; margin: 14px 0; flex-wrap: wrap; }
+  .attack-choice .atk-btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.85rem; padding: 10px 16px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(4,16,10,0.55); color: var(--cream); cursor:pointer;
+  }
+  .attack-choice .atk-btn.selected{ border-color: var(--gold); background: rgba(212,175,55,0.15); color: var(--gold-bright); }
+  .boss-atk-visual{ min-height: 100px; display:flex; align-items:center; justify-content:center; margin: 10px 0; }
+  .boss-atk-slots{ display:flex; gap: 8px; justify-content:center; }
+  .boss-atk-slots .reel{ width: 64px; height: 64px; }
+  .boss-atk-slots .reel-strip .sym{ width: 64px; height: 64px; font-size: 2rem; }
+  .boss-atk-roulette{ text-align:center; }
+  .boss-wheel-wrap{ position: relative; width: 92px; margin: 0 auto; }
+  .boss-wheel{
+    width: 92px; height: 92px; border-radius: 50%; border: 3px solid var(--gold);
+    background: conic-gradient(#7a1a26 0deg 18deg, #1a1a1a 18deg 36deg, #7a1a26 36deg 54deg, #1a1a1a 54deg 72deg,
+      #7a1a26 72deg 90deg, #1a1a1a 90deg 108deg, #7a1a26 108deg 126deg, #1a1a1a 126deg 144deg,
+      #7a1a26 144deg 162deg, #1a1a1a 162deg 180deg, #7a1a26 180deg 198deg, #1a1a1a 198deg 216deg,
+      #7a1a26 216deg 234deg, #1a1a1a 234deg 252deg, #7a1a26 252deg 270deg, #1a1a1a 270deg 288deg,
+      #7a1a26 288deg 306deg, #1a1a1a 306deg 324deg, #7a1a26 324deg 342deg, #1a1a1a 342deg 360deg);
+    transition: transform 1.2s cubic-bezier(0.15,0.85,0.25,1); position: relative;
+  }
+  .boss-wheel-pointer{
+    width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent;
+    border-top: 13px solid var(--gold-bright); margin: 0 auto -3px; position:relative; z-index:2;
+  }
+  .boss-wheel-badge{
+    position:absolute; top:50%; left:50%; transform: translate(-50%,-50%);
+    width: 36px; height: 36px; border-radius: 50%; background: var(--ink); border: 2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; font-size: 1.3rem; z-index: 3;
+  }
+  .boss-wheel-result{ font-family:'JetBrains Mono',monospace; font-size:0.85rem; margin-top:6px; min-height:20px; color: var(--gold-bright); }
+  .boss-atk-coin{ display:flex; justify-content:center; }
+  .boss-atk-coin .coin{ width: 84px; height: 84px; }
+  .boss-atk-coin .coin-glyph{ font-size: 1.7rem; }
+  .boss-atk-coin .coin-label{ font-size: 0.5rem; }
+
+  /* ---------- CHALLENGE RESULT ---------- */
+  #screen-challenge-result{ text-align:center; }
+  .result-banner{
+    font-family:'Playfair Display',serif; font-weight:900; font-size: clamp(2.4rem,8vw,4rem);
+    color: var(--gold-bright); text-shadow: 0 0 30px rgba(244,209,96,0.6);
+  }
+  .result-banner.lost{ color: var(--wine-bright); text-shadow: 0 0 30px rgba(122,26,38,0.6); }
+  .result-sub{ font-family:'JetBrains Mono',monospace; color: rgba(237,230,214,0.75); margin: 10px 0 26px; }
+  .result-stats{
+    font-family:'JetBrains Mono',monospace; font-size: 0.85rem; color: var(--gold);
+    display:flex; gap: 20px; justify-content:center; flex-wrap:wrap; margin-bottom: 24px;
+  }
+  .result-items{ display:flex; gap: 10px; justify-content:center; flex-wrap:wrap; margin-bottom: 30px; }
+  .result-item-icon{
+    width: 52px; height:52px; border-radius: 10px; background: var(--felt); border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size: 1.6rem;
+  }
+  .result-item-icon.empty{ opacity: 0.25; }
 
   footer.note{
     margin-top: 34px; font-family:'JetBrains Mono',monospace; font-size:0.68rem;
@@ -866,6 +973,12 @@
     </div>
   </div>
   </div>
+</div>
+
+<!-- CHALLENGE HUD (floating timer, visible during challenge prep) -->
+<div class="challenge-hud" id="challengeHud">
+  <span class="challenge-hud-timer" id="challengeHudTimer">10:00</span>
+  <button class="challenge-hud-btn" id="challengeHudBossBtn">⚔️ Zum Bosskampf</button>
 </div>
 
 <!-- WIN CELEBRATION (global overlay) -->
@@ -989,7 +1102,135 @@
   </div>
 </section>
 
-<!-- BLACKJACK -->
+<!-- MODE SELECT SCREEN -->
+<section class="screen" id="screen-mode-select">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="logo-small">LUCKY SEVEN</span>
+    </div>
+  </div>
+  <div class="menu-wrap">
+    <h2 class="menu-title">Wie willst du spielen?</h2>
+    <div class="menu-sub">Wähl deinen Modus</div>
+    <div class="game-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 640px; margin: 0 auto;">
+      <div class="game-card" id="modeFreePlay">
+        <span class="game-icon">🎲</span>
+        <h3>Frei spielen</h3>
+        <p>Alle Spiele, kein Zeitdruck, sammle Chips und stylische Klamotten in Ruhe.</p>
+        <span class="card-cta">Los geht's</span>
+      </div>
+      <div class="game-card" id="modeChallenge">
+        <span class="game-icon">⚔️</span>
+        <h3>Challenge-Modus</h3>
+        <p>Eigenes Guthaben, Zeitlimit, Ausrüstung kaufen und am Ende gegen den Boss antreten.</p>
+        <span class="card-cta">Herausforderung</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGE DIFFICULTY SELECT -->
+<section class="screen" id="screen-challenge-difficulty">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" id="diffBackBtn">← Zurück</button>
+      <span class="logo-small">Challenge</span>
+    </div>
+  </div>
+  <div class="menu-wrap">
+    <h2 class="menu-title">Schwierigkeit wählen</h2>
+    <div class="menu-sub">Mehr Risiko, mehr Boss, weniger Zeit</div>
+    <div class="game-grid" id="difficultyGrid" style="grid-template-columns: repeat(4, 1fr);"></div>
+  </div>
+</section>
+
+<!-- GEAR CHECK SCREEN (60s final prep before boss fight) -->
+<section class="screen" id="screen-gear-check">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="logo-small">Letzte Vorbereitung</span>
+    </div>
+    <div class="balance" id="balanceGear"><span class="chip-icon"></span><span id="balanceGearVal">0</span></div>
+  </div>
+  <div class="table-wrap" style="max-width: 520px; text-align:center;">
+    <h2 class="table-title">Rüst dich aus!</h2>
+    <div class="msg" id="gearCheckMsg">Kampf beginnt in <span id="gearCheckTimer">60</span>s</div>
+    <p style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color: rgba(237,230,214,0.7);">
+      Klick auf den Charakter unten rechts für Kleiderschrank & Shop.
+    </p>
+    <div class="controls">
+      <button class="btn" id="gearOpenInv">👕 Kleiderschrank</button>
+      <button class="btn" id="gearOpenShop">🛍️ Shop</button>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="gearSkipBtn">⚔️ Kampf jetzt starten</button>
+    </div>
+  </div>
+</section>
+
+<!-- BOSS FIGHT SCREEN -->
+<section class="screen" id="screen-bossfight">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="logo-small" id="bossFightTitle">Bosskampf</span>
+    </div>
+  </div>
+  <div class="table-wrap" style="max-width: 640px;">
+    <div class="bf-vs-row">
+      <div class="bf-combatant">
+        <div class="bf-hp-label">Boss: <span id="bossName">—</span></div>
+        <div class="bf-hp-bar"><div class="bf-hp-fill boss-fill" id="bossHpFill"></div></div>
+        <div class="bf-hp-text" id="bossHpText">100 / 100</div>
+      </div>
+    </div>
+    <div class="boss-visual" id="bossVisual">👹</div>
+    <div class="bf-vs-row">
+      <div class="bf-combatant">
+        <div class="bf-hp-label">Du</div>
+        <div class="bf-hp-bar"><div class="bf-hp-fill player-fill" id="playerHpFill"></div></div>
+        <div class="bf-hp-text" id="playerHpText">100 / 100</div>
+      </div>
+    </div>
+    <div class="msg" id="bossMsg">Der Kampf beginnt…</div>
+    <div class="boss-atk-visual" id="bossAtkVisual">
+      <div class="boss-atk-slots" id="bossAtkSlots" style="display:none;">
+        <div class="reel" id="bossReel0"><div class="reel-strip" id="bossStrip0"><div class="sym">🍒</div></div></div>
+        <div class="reel" id="bossReel1"><div class="reel-strip" id="bossStrip1"><div class="sym">🍒</div></div></div>
+        <div class="reel" id="bossReel2"><div class="reel-strip" id="bossStrip2"><div class="sym">🍒</div></div></div>
+      </div>
+      <div class="boss-atk-roulette" id="bossAtkRoulette" style="display:none;">
+        <div class="boss-wheel-wrap">
+          <div class="boss-wheel-pointer"></div>
+          <div class="boss-wheel" id="bossWheel">
+            <div class="boss-wheel-badge" id="bossWheelBadge">?</div>
+          </div>
+        </div>
+        <div class="boss-wheel-result" id="bossWheelResult"></div>
+      </div>
+      <div class="boss-atk-coin" id="bossAtkCoin" style="display:none;">
+        <div class="coin" id="bossCoin">
+          <div class="coin-face coin-front"><span class="coin-glyph">♛</span><span class="coin-label">KOPF</span></div>
+          <div class="coin-face coin-back"><span class="coin-glyph">★</span><span class="coin-label">ZAHL</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="attack-choice" id="bossPickChoice" style="display:none;"></div>
+    <div class="attack-choice" id="attackChoice"></div>
+    <div class="controls">
+      <button class="btn primary" id="bossAttackBtn">Angreifen</button>
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGE RESULT SCREEN -->
+<section class="screen" id="screen-challenge-result">
+  <div class="result-banner" id="resultBanner">GEWONNEN</div>
+  <div class="result-sub" id="resultSub">Der Boss ist besiegt.</div>
+  <div class="result-stats" id="resultStats"></div>
+  <div class="result-items" id="resultItems"></div>
+  <button class="btn primary" id="resultRestartBtn">Nochmal versuchen</button>
+</section>
+
 <section class="screen" id="screen-blackjack">
   <div class="topbar">
     <div class="topbar-left">
@@ -1230,6 +1471,15 @@
 
   /* ================= STATE ================= */
   let balance = 1000;
+  let mode = 'free'; // 'free' | 'challenge'
+  let savedFreeBalance = 1000;
+  let challengeDifficulty = null;
+  let challengeTimeLeft = 0;
+  let challengeTimerInterval = null;
+  let challengeOwned = { hat:[], hair:[], top:[], pants:[], shoes:[], item:[] };
+  let challengeEquipped = { hat:null, hair:null, top:null, pants:null, shoes:null, item:null };
+  let playerHp = 100, playerMaxHp = 100;
+  let bossState = null;
   const balNodes = {
     menu: document.getElementById('balanceMenuVal'),
     bj: document.getElementById('balanceBJVal'),
@@ -1238,6 +1488,7 @@
     cf: document.getElementById('balanceCFVal'),
     bf: document.getElementById('balanceBFVal'),
     pg: document.getElementById('balancePGVal'),
+    gear: document.getElementById('balanceGearVal'),
   };
   const balWraps = {
     menu: document.getElementById('balanceMenu'),
@@ -1247,6 +1498,7 @@
     cf: document.getElementById('balanceCF'),
     bf: document.getElementById('balanceBF'),
     pg: document.getElementById('balancePG'),
+    gear: document.getElementById('balanceGear'),
   };
   function fmt(n){ return n.toLocaleString('de-DE'); }
   function renderBalance(flash){
@@ -1259,6 +1511,14 @@
     renderBalance(true);
   }
   renderBalance(false);
+
+  // During challenge prep, easier difficulties get a luck bonus on winnings (not on losses/bets)
+  // to make it realistic to gear up in the shorter time limits.
+  const CHALLENGE_LUCK = { easy: 1.8, medium: 1.35, hard: 1.0, extreme: 0.8 };
+  function luck(amount){
+    if(mode !== 'challenge' || !challengeDifficulty) return amount;
+    return Math.round(amount * (CHALLENGE_LUCK[challengeDifficulty] || 1));
+  }
 
   /* ================= WIN CELEBRATION (used by every game) ================= */
   const winCelebration = document.getElementById('winCelebration');
@@ -1358,7 +1618,7 @@
     name => `Immer diese Hektik. Na gut, ${name} halt.`,
     name => `Ob das gut geht, bei ${name}…`,
   ];
-  document.querySelectorAll('.game-card').forEach(card => {
+  document.querySelectorAll('#screen-menu .game-card[data-game]').forEach(card => {
     card.addEventListener('click', () => {
       showScreen('screen-' + card.dataset.game);
       const name = GAME_NAMES[card.dataset.game] || '';
@@ -1449,6 +1709,45 @@
   const CAT_LABEL = { hat:'Hut', hair:'Haare', top:'Oberteil', pants:'Hose', shoes:'Schuhe', item:'Gegenstand' };
   const CAT_ORDER = ['hat','hair','top','pants','shoes','item'];
 
+  // Challenge-Mode gear: 5 armor slots (dmgReduction %) + 1 weapon slot (dmgBonus %), separate economy from free play
+  const CHALLENGE_SHOP_ITEMS = {
+    hat: [
+      { id:'c_hat_cap', name:'Lederkappe', icon:'🧢', price:150, dmgReduction:2 },
+      { id:'c_hat_top', name:'Kriegshelm', icon:'⛑️', tier:'selten', price:900, dmgReduction:6 },
+      { id:'c_hat_crown', name:'Krone der Bank', icon:'👑', tier:'legendaer', price:6000, dmgReduction:12 },
+    ],
+    hair: [
+      { id:'c_hair_short', name:'Kurzhaar', icon:'💇', color:'#3b2a1a', price:0, dmgReduction:2 },
+      { id:'c_hair_curly', name:'Kampf-Locken', icon:'💇', color:'#d4af37', tier:'selten', price:800, dmgReduction:6 },
+      { id:'c_hair_mohawk', name:'Kriegs-Irokese', icon:'💇', color:'#ff2d95', tier:'legendaer', price:5500, dmgReduction:12 },
+    ],
+    top: [
+      { id:'c_top_shirt', name:'Lederweste', icon:'👕', color:'#3d6b8a', price:180, dmgReduction:2 },
+      { id:'c_top_suit', name:'Kettenhemd', icon:'🥼', color:'#1f2933', tier:'selten', price:1200, dmgReduction:6 },
+      { id:'c_top_gold', name:'Goldrüstung', icon:'🧥', color:'#d4af37', tier:'legendaer', price:7000, dmgReduction:12 },
+    ],
+    pants: [
+      { id:'c_pants_jeans', name:'Beinschutz', icon:'👖', color:'#2c4a6e', price:160, dmgReduction:2 },
+      { id:'c_pants_chino', name:'Panzerhose', icon:'👖', color:'#6b5b3d', tier:'selten', price:1000, dmgReduction:6 },
+      { id:'c_pants_gold', name:'Goldbeinschienen', icon:'👖', color:'#d4af37', tier:'legendaer', price:6500, dmgReduction:12 },
+    ],
+    shoes: [
+      { id:'c_shoes_sneaker', name:'Laufschuhe', icon:'👟', color:'#e8e8e8', price:170, dmgReduction:2 },
+      { id:'c_shoes_leather', name:'Stahlkappen', icon:'👞', color:'#3a2418', tier:'selten', price:1050, dmgReduction:6 },
+      { id:'c_shoes_diamond', name:'Diamantstiefel', icon:'💎', color:'#8fd9ff', tier:'legendaer', price:6800, dmgReduction:12 },
+    ],
+    item: [
+      { id:'c_item_coffee', name:'Dolch', icon:'🗡️', price:150, dmgBonus:5 },
+      { id:'c_item_cane', name:'Kampfstock', icon:'🦯', tier:'selten', price:950, dmgBonus:15 },
+      { id:'c_item_gold', name:'Goldschwert', icon:'⚔️', tier:'legendaer', price:6200, dmgBonus:30 },
+    ],
+  };
+
+  function activeMode(){ return mode; }
+  function activeShopItems(){ return mode === 'challenge' ? CHALLENGE_SHOP_ITEMS : SHOP_ITEMS; }
+  function activeOwned(){ return mode === 'challenge' ? challengeOwned : owned; }
+  function activeEquipped(){ return mode === 'challenge' ? challengeEquipped : equipped; }
+
   const RENTNER_SPRUECHE = [
     'Früher war hier alles Wiese!',
     'Das Internet ist auch nur ne Modeerscheinung.',
@@ -1510,11 +1809,12 @@
   }
   scheduleIdleChatter();
 
-  function findItem(cat, id){ return SHOP_ITEMS[cat].find(it => it.id === id); }
+  function findItem(cat, id){ return activeShopItems()[cat].find(it => it.id === id); }
 
   function renderAvatar(){
     avatarWidget.classList.toggle('gender-f', avatarGender === 'f');
     avatarWidget.classList.toggle('gender-m', avatarGender === 'm');
+    const eq = activeEquipped();
 
     const hatEl = document.getElementById('avHat');
     const hairEl = document.getElementById('avHair');
@@ -1523,28 +1823,42 @@
     const shoesEl = document.getElementById('avShoes');
     const itemEl = document.getElementById('avItem');
 
-    if(equipped.hat){ const it = findItem('hat', equipped.hat); hatEl.textContent = it.icon; hatEl.style.display = 'block'; }
+    if(eq.hat){ const it = findItem('hat', eq.hat); hatEl.textContent = it.icon; hatEl.style.display = 'block'; }
     else hatEl.style.display = 'none';
 
-    const hairIt = equipped.hair ? findItem('hair', equipped.hair) : null;
+    const hairIt = eq.hair ? findItem('hair', eq.hair) : null;
     hairEl.style.background = hairIt ? hairIt.color : '#3b2a1a';
 
-    if(equipped.top){ const it = findItem('top', equipped.top); topEl.textContent = it.icon; topEl.style.background = it.color; topEl.style.display='flex'; }
+    if(eq.top){ const it = findItem('top', eq.top); topEl.textContent = it.icon; topEl.style.background = it.color; topEl.style.display='flex'; }
     else topEl.style.display = 'none';
 
-    if(equipped.pants){ const it = findItem('pants', equipped.pants); pantsEl.textContent = it.icon; pantsEl.style.background = it.color; pantsEl.style.display='flex'; }
+    if(eq.pants){ const it = findItem('pants', eq.pants); pantsEl.textContent = it.icon; pantsEl.style.background = it.color; pantsEl.style.display='flex'; }
     else pantsEl.style.display = 'none';
 
-    if(equipped.shoes){ const it = findItem('shoes', equipped.shoes); shoesEl.textContent = it.icon; shoesEl.style.display='flex'; }
+    if(eq.shoes){ const it = findItem('shoes', eq.shoes); shoesEl.textContent = it.icon; shoesEl.style.display='flex'; }
     else shoesEl.style.display = 'none';
 
-    if(equipped.item){ const it = findItem('item', equipped.item); itemEl.textContent = it.icon; itemEl.style.display = 'block'; }
+    if(eq.item){ const it = findItem('item', eq.item); itemEl.textContent = it.icon; itemEl.style.display = 'block'; }
     else itemEl.style.display = 'none';
 
-    const equippedTier = cat => { const id = equipped[cat]; const it = id && findItem(cat, id); return it ? it.tier : null; };
+    const equippedTier = cat => { const id = eq[cat]; const it = id && findItem(cat, id); return it ? it.tier : null; };
     const tiers = CAT_ORDER.map(equippedTier);
     avatarWidget.classList.toggle('has-legendary', tiers.includes('legendaer'));
     avatarWidget.classList.toggle('has-selten', !tiers.includes('legendaer') && tiers.includes('selten'));
+  }
+
+  // total combat stats from currently equipped challenge gear
+  function getChallengeCombatStats(){
+    let dmgReduction = 0, dmgBonus = 0;
+    CAT_ORDER.forEach(cat => {
+      const id = challengeEquipped[cat];
+      if(!id) return;
+      const it = findItem(cat, id);
+      if(!it) return;
+      if(it.dmgReduction) dmgReduction += it.dmgReduction;
+      if(it.dmgBonus) dmgBonus += it.dmgBonus;
+    });
+    return { dmgReduction: Math.min(dmgReduction, 65), dmgBonus };
   }
 
   /* ---- Intro flow: Gender -> Fake-Ad -> Menu ---- */
@@ -1577,7 +1891,7 @@
     adModal.classList.remove('active');
     avatarWidget.classList.add('visible');
     renderAvatar();
-    showScreen('screen-menu');
+    showScreen('screen-mode-select');
     setTimeout(() => rentnerSay('Na, dann wollen wir mal die Bude aufmischen!'), 400);
   });
 
@@ -1601,7 +1915,8 @@
   function renderInvGrid(){
     invGrid.innerHTML = '';
     invBalance.textContent = fmt(balance) + ' Chips';
-    const ownedIds = owned[invActiveCat];
+    const own = activeOwned(), eq = activeEquipped();
+    const ownedIds = own[invActiveCat];
     if(ownedIds.length === 0){
       invGrid.innerHTML = '<div class="inv-empty">Noch nichts gekauft. Schau im Shop vorbei!</div>';
       return;
@@ -1609,10 +1924,10 @@
     ownedIds.forEach(id => {
       const it = findItem(invActiveCat, id);
       const cell = document.createElement('div');
-      cell.className = 'inv-item' + (equipped[invActiveCat] === id ? ' equipped' : '') + (it.tier ? ' ' + it.tier : '');
+      cell.className = 'inv-item' + (eq[invActiveCat] === id ? ' equipped' : '') + (it.tier ? ' ' + it.tier : '');
       cell.innerHTML = `<span class="inv-icon">${it.icon}</span><span class="inv-name">${it.name}</span>`;
       cell.addEventListener('click', () => {
-        equipped[invActiveCat] = (equipped[invActiveCat] === id) ? null : id;
+        eq[invActiveCat] = (eq[invActiveCat] === id) ? null : id;
         renderAvatar(); renderInvGrid();
       });
       invGrid.appendChild(cell);
@@ -1640,6 +1955,7 @@
   function renderShop(){
     shopBalance.textContent = fmt(balance) + ' Chips';
     shopList.innerHTML = '';
+    const own = activeOwned(), eq = activeEquipped(), items = activeShopItems();
     CAT_ORDER.forEach(cat => {
       const block = document.createElement('div');
       block.className = 'shop-cat';
@@ -1647,15 +1963,18 @@
       title.className = 'shop-cat-title';
       title.textContent = CAT_LABEL[cat];
       block.appendChild(title);
-      SHOP_ITEMS[cat].forEach(it => {
-        const isOwned = owned[cat].includes(it.id);
+      items[cat].forEach(it => {
+        const isOwned = own[cat].includes(it.id);
         const row = document.createElement('div');
         row.className = 'shop-item-row' + (it.tier ? ' ' + it.tier : '');
         const tagHtml = it.tier === 'legendaer' ? '<span class="shop-legendary-tag">legendär</span>'
                        : it.tier === 'selten' ? '<span class="shop-rare-tag">selten</span>' : '';
+        const statHtml = mode === 'challenge'
+          ? `<div class="shop-combat-stat">${it.dmgReduction ? `🛡️ -${it.dmgReduction}% Schaden` : `⚔️ +${it.dmgBonus}% Schaden`}</div>`
+          : '';
         row.innerHTML = `
           <span class="shop-icon">${it.icon}</span>
-          <span class="shop-name">${it.name}${tagHtml}</span>
+          <span class="shop-name">${it.name}${tagHtml}${statHtml}</span>
         `;
         const btn = document.createElement('button');
         btn.className = 'shop-buy-btn' + (isOwned ? ' owned' : '');
@@ -1666,8 +1985,8 @@
           btn.addEventListener('click', () => {
             if(balance < it.price) return;
             changeBalance(-it.price);
-            owned[cat].push(it.id);
-            equipped[cat] = it.id;
+            own[cat].push(it.id);
+            eq[cat] = it.id;
             renderAvatar(); renderShop();
             rentnerSay('Sieht doch gleich schicker aus, was?');
           });
@@ -1679,6 +1998,407 @@
     });
   }
   document.getElementById('shopClose').addEventListener('click', () => shopModal.classList.remove('active'));
+
+  /* ============================================================
+     CHALLENGE MODE: mode select -> difficulty -> prep (timer + shop)
+     -> boss fight -> result
+  ============================================================ */
+  const DIFFICULTIES = {
+    easy:    { key:'easy',    label:'Leicht', startMoney:800, timeSec:12*60, freeChoice:true,
+               boss:{ name:'Der Croupier', emoji:'🎩', theme:'green', hp:90,  dmgMin:30, dmgMax:45 } },
+    medium:  { key:'medium',  label:'Mittel', startMoney:500, timeSec:10*60, freeChoice:true,
+               boss:{ name:'Der Buchmacher', emoji:'📋', theme:'amber', hp:130, dmgMin:40, dmgMax:58 } },
+    hard:    { key:'hard',    label:'Schwer', startMoney:350, timeSec:8*60,  freeChoice:false,
+               boss:{ name:'Die Bank', emoji:'🏦', theme:'red', hp:170, dmgMin:55, dmgMax:75 } },
+    extreme: { key:'extreme', label:'Extrem', startMoney:250, timeSec:5*60,  freeChoice:false,
+               boss:{ name:'Der Hausvorteil', emoji:'👹', theme:'black', hp:210, dmgMin:70, dmgMax:95 } },
+  };
+
+  const BOSS_VOICES = {
+    easy: {
+      onHitDealt: ['Aua, na sowas.', 'Das tat sicher weh, was?', 'Kleiner Denkzettel für dich.'],
+      onHitTaken: ['Autsch, nicht schlecht.', 'Ok, das hat gesessen.', 'Na warte, Kleiner.'],
+      onDefeat: ['Alles klar, du hast gewonnen. Fair war\'s.'],
+      onVictory: ['Tja, das Haus gewinnt eben meistens.'],
+    },
+    medium: {
+      onHitDealt: ['Hab ich dir nicht gesagt, lass es.', 'Die Quote war nie auf deiner Seite.', 'Das war vorhersehbar.'],
+      onHitTaken: ['Glückstreffer.', 'Das zähl ich nicht.', 'Kurzfristiger Ausreißer, mehr nicht.'],
+      onDefeat: ['Unglaublich... du hast tatsächlich gewonnen.'],
+      onVictory: ['Die Bank gewinnt immer, hab ich recht behalten.'],
+    },
+    hard: {
+      onHitDealt: ['Ich bin die Bank. Ich verliere nicht.', 'Das war nur der Anfang.', 'Spürst du meine Macht?'],
+      onHitTaken: ['Das war... unerwartet.', 'Ein Kratzer. Nicht mehr.', 'Interessant.'],
+      onDefeat: ['Unmöglich... die Bank... verliert?'],
+      onVictory: ['Wie erwartet. Die Bank gewinnt immer.'],
+    },
+    extreme: {
+      onHitDealt: ['Ich BIN der Hausvorteil.', 'Niemand schlägt die Mathematik.', 'Du hattest nie eine Chance.'],
+      onHitTaken: ['Das war ein Fehler von dir.', 'Amüsant. Aber bedeutungslos.', 'Grrr.'],
+      onDefeat: ['Das... das darf nicht sein. NEIN.'],
+      onVictory: ['Der Hausvorteil ist ungeschlagen. Wie immer.'],
+    },
+  };
+
+  const ATTACK_GAMES = [
+    { key:'slots', label:'🎰 Slots', icon:'🎰' },
+    { key:'roulette', label:'🎡 Roulette', icon:'🎡' },
+    { key:'coinflip', label:'🪙 Münzwurf', icon:'🪙' },
+  ];
+
+  let currentAttackGame = ATTACK_GAMES[0].key;
+  let combatActive = false;
+
+  const challengeHud = document.getElementById('challengeHud');
+  const challengeHudTimer = document.getElementById('challengeHudTimer');
+  const bossMsgEl = document.getElementById('bossMsg');
+
+  function renderDifficultyGrid(){
+    const grid = document.getElementById('difficultyGrid');
+    grid.innerHTML = '';
+    Object.values(DIFFICULTIES).forEach(diff => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      const mm = Math.floor(diff.timeSec/60);
+      const luckPct = Math.round((CHALLENGE_LUCK[diff.key] - 1) * 100);
+      const luckLine = luckPct > 0 ? `🍀 +${luckPct}% Gewinne beim Grinden` : (luckPct < 0 ? `🍀 ${luckPct}% Gewinne beim Grinden` : '');
+      card.innerHTML = `
+        <span class="game-icon">${diff.boss.emoji}</span>
+        <h3>${diff.label}</h3>
+        <p>${fmt(diff.startMoney)} Chips Start · ${mm} Min Zeit<br>Gegner: ${diff.boss.name}${luckLine ? '<br>' + luckLine : ''}</p>
+        <span class="card-cta">Start</span>
+      `;
+      card.addEventListener('click', () => startChallenge(diff.key));
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById('modeFreePlay').addEventListener('click', () => {
+    if(mode === 'challenge'){ mode = 'free'; balance = savedFreeBalance; renderBalance(false); renderAvatar(); }
+    showScreen('screen-menu');
+  });
+  document.getElementById('modeChallenge').addEventListener('click', () => {
+    renderDifficultyGrid();
+    showScreen('screen-challenge-difficulty');
+  });
+  document.getElementById('diffBackBtn').addEventListener('click', () => {
+    mode = 'free'; balance = savedFreeBalance; renderBalance(false); renderAvatar();
+    showScreen('screen-mode-select');
+  });
+
+  function updateHudTimerDisplay(){
+    const m = Math.floor(challengeTimeLeft/60), s = challengeTimeLeft%60;
+    challengeHudTimer.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    challengeHudTimer.classList.toggle('urgent', challengeTimeLeft <= 60);
+  }
+
+  function startChallenge(diffKey){
+    const diff = DIFFICULTIES[diffKey];
+    if(mode === 'free') savedFreeBalance = balance;
+    mode = 'challenge';
+    challengeDifficulty = diffKey;
+    balance = diff.startMoney;
+    challengeTimeLeft = diff.timeSec;
+    CAT_ORDER.forEach(cat => { challengeOwned[cat] = []; challengeEquipped[cat] = null; });
+    renderBalance(false);
+    renderAvatar();
+    challengeHud.classList.add('visible');
+    updateHudTimerDisplay();
+    clearInterval(challengeTimerInterval);
+    challengeTimerInterval = setInterval(() => {
+      challengeTimeLeft--;
+      updateHudTimerDisplay();
+      if(challengeTimeLeft <= 0){
+        clearInterval(challengeTimerInterval);
+        startGearCheck();
+      }
+    }, 1000);
+    showScreen('screen-menu');
+    setTimeout(() => rentnerSay(`${diff.label}? Dann mal ran ans Gambeln, die Uhr läuft!`), 400);
+  }
+
+  document.getElementById('challengeHudBossBtn').addEventListener('click', () => {
+    clearInterval(challengeTimerInterval);
+    startGearCheck();
+  });
+
+  /* ---- Gear check: 60s final prep screen before the actual fight, skippable ---- */
+  let gearCheckInterval = null;
+  function startGearCheck(){
+    challengeHud.classList.remove('visible');
+    clearInterval(gearCheckInterval);
+    let t = 60;
+    document.getElementById('gearCheckTimer').textContent = t;
+    showScreen('screen-gear-check');
+    setTimeout(() => rentnerSay('Denk dran: von JEDEM Teil brauchst du mindestens eins, sonst bist du da drin quasi Freiwild!'), 300);
+    gearCheckInterval = setInterval(() => {
+      t--;
+      document.getElementById('gearCheckTimer').textContent = t;
+      if(t <= 0){
+        clearInterval(gearCheckInterval);
+        startBossFight();
+      }
+    }, 1000);
+  }
+  document.getElementById('gearSkipBtn').addEventListener('click', () => {
+    clearInterval(gearCheckInterval);
+    startBossFight();
+  });
+  document.getElementById('gearOpenInv').addEventListener('click', () => {
+    invModal.classList.add('active');
+    renderInvTabs(); renderInvGrid();
+  });
+  document.getElementById('gearOpenShop').addEventListener('click', () => openShop());
+
+  function updateBossHpUI(){
+    const pct = Math.max(0, bossState.hp/bossState.maxHp*100);
+    document.getElementById('bossHpFill').style.width = pct + '%';
+    document.getElementById('bossHpText').textContent = `${Math.max(0,bossState.hp)} / ${bossState.maxHp}`;
+  }
+  function updatePlayerHpUI(){
+    const pct = Math.max(0, playerHp/playerMaxHp*100);
+    document.getElementById('playerHpFill').style.width = pct + '%';
+    document.getElementById('playerHpText').textContent = `${Math.max(0,playerHp)} / ${playerMaxHp}`;
+  }
+
+  function setupAttackChoice(freeChoice){
+    const wrap = document.getElementById('attackChoice');
+    wrap.innerHTML = '';
+    if(freeChoice){
+      currentAttackGame = ATTACK_GAMES[0].key;
+      ATTACK_GAMES.forEach((g,i) => {
+        const btn = document.createElement('button');
+        btn.className = 'atk-btn' + (i===0 ? ' selected' : '');
+        btn.textContent = g.label;
+        btn.addEventListener('click', () => {
+          currentAttackGame = g.key;
+          wrap.querySelectorAll('.atk-btn').forEach(b=>b.classList.remove('selected'));
+          btn.classList.add('selected');
+        });
+        wrap.appendChild(btn);
+      });
+    } else {
+      wrap.innerHTML = '<div class="msg" style="margin:0;">🎲 Zufälliges Spiel pro Runde</div>';
+      currentAttackGame = null;
+    }
+  }
+
+  function startBossFight(){
+    challengeHud.classList.remove('visible');
+    const diff = DIFFICULTIES[challengeDifficulty];
+    bossState = { hp: diff.boss.hp, maxHp: diff.boss.hp };
+    playerHp = playerMaxHp = 100;
+    document.getElementById('bossFightTitle').textContent = diff.boss.name;
+    document.getElementById('bossName').textContent = diff.boss.name;
+    const visualEl = document.getElementById('bossVisual');
+    visualEl.textContent = diff.boss.emoji;
+    visualEl.className = 'boss-visual theme-' + diff.boss.theme;
+    updateBossHpUI(); updatePlayerHpUI();
+    bossMsgEl.textContent = `${diff.boss.name} tritt dir gegenüber…`;
+    document.getElementById('bossAtkSlots').style.display = 'none';
+    document.getElementById('bossAtkRoulette').style.display = 'none';
+    document.getElementById('bossAtkCoin').style.display = 'none';
+    document.getElementById('bossPickChoice').style.display = 'none';
+    setupAttackChoice(diff.freeChoice);
+    document.getElementById('bossAttackBtn').disabled = false;
+    combatActive = true;
+    showScreen('screen-bossfight');
+  }
+
+  document.getElementById('bossAttackBtn').addEventListener('click', () => {
+    if(!combatActive) return;
+    const diff = DIFFICULTIES[challengeDifficulty];
+    const gameKey = diff.freeChoice ? currentAttackGame : ATTACK_GAMES[Math.floor(Math.random()*ATTACK_GAMES.length)].key;
+    runAttackRoll(gameKey, diff);
+  });
+
+  const BOSS_SLOT_SYMS = ['🍒','🍋','🔔','💎','7️⃣'];
+  function spinBossReel(stripEl, finalSym, delay, cb){
+    stripEl.innerHTML = '';
+    const fillerCount = 8;
+    for(let i=0;i<fillerCount;i++){
+      const d = document.createElement('div'); d.className = 'sym';
+      d.textContent = BOSS_SLOT_SYMS[Math.floor(Math.random()*BOSS_SLOT_SYMS.length)];
+      stripEl.appendChild(d);
+    }
+    const finalDiv = document.createElement('div'); finalDiv.className = 'sym'; finalDiv.textContent = finalSym;
+    stripEl.appendChild(finalDiv);
+    stripEl.classList.remove('settle');
+    stripEl.style.transition = 'none';
+    stripEl.style.transform = 'translateY(0)';
+    void stripEl.offsetWidth;
+    stripEl.classList.add('spin');
+    setTimeout(() => {
+      stripEl.classList.remove('spin');
+      stripEl.classList.add('settle');
+      stripEl.style.transform = `translateY(-${fillerCount*84}px)`;
+      setTimeout(cb, 620);
+    }, delay);
+  }
+  function runBossSlots(win, onDone){
+    let syms;
+    if(win){
+      const s = BOSS_SLOT_SYMS[Math.floor(Math.random()*BOSS_SLOT_SYMS.length)];
+      syms = [s,s,s];
+    } else {
+      do{
+        syms = [0,0,0].map(() => BOSS_SLOT_SYMS[Math.floor(Math.random()*BOSS_SLOT_SYMS.length)]);
+      } while(syms[0]===syms[1] && syms[1]===syms[2]);
+    }
+    const strips = [document.getElementById('bossStrip0'), document.getElementById('bossStrip1'), document.getElementById('bossStrip2')];
+    let done = 0;
+    strips.forEach((strip,i) => {
+      spinBossReel(strip, syms[i], 450+i*280, () => { done++; if(done===3) setTimeout(onDone, 200); });
+    });
+  }
+
+  let bossWheelRotation = 0;
+  function runBossRouletteSpin(landedColor, onDone){
+    const wheelEl = document.getElementById('bossWheel');
+    const badgeEl = document.getElementById('bossWheelBadge');
+    const resultEl = document.getElementById('bossWheelResult');
+    resultEl.textContent = '';
+    badgeEl.textContent = '?';
+    const spins = 4*360;
+    const landSlice = landedColor === 'red' ? Math.floor(Math.random()*10)*36 + 8 : Math.floor(Math.random()*10)*36 + 26;
+    bossWheelRotation += spins + landSlice - (bossWheelRotation % 360);
+    wheelEl.style.transform = `rotate(${bossWheelRotation}deg)`;
+    setTimeout(() => {
+      badgeEl.textContent = landedColor === 'red' ? '🔴' : '⚫';
+      resultEl.textContent = landedColor === 'red' ? 'Es fällt: Rot' : 'Es fällt: Schwarz';
+      setTimeout(onDone, 500);
+    }, 1250);
+  }
+
+  function runBossCoinFlip(landedSide, onDone){
+    const coinEl = document.getElementById('bossCoin');
+    coinEl.className = 'coin';
+    coinEl.style.transform = '';
+    void coinEl.offsetWidth;
+    coinEl.className = 'coin ' + (landedSide === 'heads' ? 'toss-heads' : 'toss-tails');
+    setTimeout(() => {
+      coinEl.classList.remove('toss-heads','toss-tails');
+      coinEl.style.transform = `rotateY(${landedSide === 'heads' ? 0 : 180}deg)`;
+      setTimeout(onDone, 400);
+    }, 1400);
+  }
+
+  function showBossPick(kind, diff){
+    const pickWrap = document.getElementById('bossPickChoice');
+    pickWrap.innerHTML = '';
+    pickWrap.style.display = 'flex';
+    bossMsgEl.textContent = kind === 'roulette' ? 'Wähl deine Farbe…' : 'Wähl deine Seite…';
+    const options = kind === 'roulette'
+      ? [{ v:'red', label:'🔴 Rot' }, { v:'black', label:'⚫ Schwarz' }]
+      : [{ v:'heads', label:'♛ Kopf' }, { v:'tails', label:'★ Zahl' }];
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'atk-btn';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', () => {
+        pickWrap.style.display = 'none';
+        if(kind === 'roulette'){
+          const landed = Math.random() < 0.5 ? 'red' : 'black';
+          const win = landed === opt.v;
+          runBossRouletteSpin(landed, () => resolveRound(win, diff));
+        } else {
+          const landed = Math.random() < 0.5 ? 'heads' : 'tails';
+          const win = landed === opt.v;
+          runBossCoinFlip(landed, () => resolveRound(win, diff));
+        }
+      });
+      pickWrap.appendChild(btn);
+    });
+  }
+
+  function runAttackRoll(gameKey, diff){
+    combatActive = false;
+    document.getElementById('bossAttackBtn').disabled = true;
+    const gameDef = ATTACK_GAMES.find(g => g.key === gameKey);
+
+    document.getElementById('bossAtkSlots').style.display = gameKey === 'slots' ? 'flex' : 'none';
+    document.getElementById('bossAtkRoulette').style.display = gameKey === 'roulette' ? 'block' : 'none';
+    document.getElementById('bossAtkCoin').style.display = gameKey === 'coinflip' ? 'flex' : 'none';
+
+    if(gameKey === 'slots'){
+      bossMsgEl.textContent = `Angriff mit ${gameDef.label}…`;
+      const win = Math.random() < 0.47;
+      runBossSlots(win, () => resolveRound(win, diff));
+    } else {
+      showBossPick(gameKey, diff);
+    }
+  }
+
+  function resolveRound(win, diff){
+    const stats = getChallengeCombatStats();
+    let voiceKind;
+    if(win){
+      const crit = Math.random() < 0.15;
+      const dmg = Math.round((12 + Math.random()*8) * (1 + stats.dmgBonus/100) * (crit ? 1.8 : 1));
+      bossState.hp = Math.max(0, bossState.hp - dmg);
+      updateBossHpUI();
+      const visualEl = document.getElementById('bossVisual');
+      visualEl.classList.remove('hit'); void visualEl.offsetWidth; visualEl.classList.add('hit');
+      bossMsgEl.textContent = crit ? `KRITISCHER TREFFER! -${dmg} HP` : `Treffer! -${dmg} HP`;
+      voiceKind = 'onHitTaken';
+    } else {
+      const rawDmg = diff.boss.dmgMin + Math.random()*(diff.boss.dmgMax - diff.boss.dmgMin);
+      const dmg = Math.round(rawDmg * (1 - stats.dmgReduction/100));
+      playerHp = Math.max(0, playerHp - dmg);
+      updatePlayerHpUI();
+      bossMsgEl.textContent = `${diff.boss.name} trifft dich! -${dmg} HP`;
+      voiceKind = 'onHitDealt';
+    }
+
+    setTimeout(() => {
+      if(bossState.hp <= 0){ endChallenge(true, diff); return; }
+      if(playerHp <= 0){ endChallenge(false, diff); return; }
+      const lines = BOSS_VOICES[diff.key][voiceKind];
+      bossMsgEl.textContent = '„' + lines[Math.floor(Math.random()*lines.length)] + '"';
+      setTimeout(() => {
+        document.getElementById('bossAttackBtn').disabled = false;
+        combatActive = true;
+      }, 1000);
+    }, 900);
+  }
+
+  function endChallenge(win, diff){
+    combatActive = false;
+    const banner = document.getElementById('resultBanner');
+    const sub = document.getElementById('resultSub');
+    banner.textContent = win ? 'GEWONNEN' : 'VERLOREN';
+    banner.classList.toggle('lost', !win);
+    if(win){
+      sub.textContent = `Du hast ${diff.boss.name} bezwungen!`;
+    } else {
+      const lines = BOSS_VOICES[diff.key].onVictory;
+      sub.textContent = `${diff.boss.name}: „${lines[Math.floor(Math.random()*lines.length)]}"`;
+    }
+    document.getElementById('resultStats').innerHTML = `
+      <span>Schwierigkeit: ${diff.label}</span>
+      <span>Gegner: ${diff.boss.name}</span>
+    `;
+    const itemsWrap = document.getElementById('resultItems');
+    itemsWrap.innerHTML = '';
+    CAT_ORDER.forEach(cat => {
+      const id = challengeEquipped[cat];
+      const div = document.createElement('div');
+      div.className = 'result-item-icon' + (id ? '' : ' empty');
+      div.textContent = id ? findItem(cat, id).icon : '—';
+      itemsWrap.appendChild(div);
+    });
+    showScreen('screen-challenge-result');
+  }
+
+  document.getElementById('resultRestartBtn').addEventListener('click', () => {
+    CAT_ORDER.forEach(cat => { challengeOwned[cat] = []; challengeEquipped[cat] = null; });
+    challengeDifficulty = null;
+    renderAvatar();
+    renderDifficultyGrid();
+    showScreen('screen-challenge-difficulty');
+  });
+
   (function Blackjack(){
     const dealerHandEl = document.getElementById('dealerHand');
     const playerHandEl = document.getElementById('playerHand');
@@ -1766,7 +2486,7 @@
         renderHands(true);
         const dealerHasBJ = dealerCards.length===2 && handValue(dealerCards)===21;
         if(dealerHasBJ){ changeBalance(bet); msgEl.textContent = 'Beide Blackjack — Push.'; }
-        else{ const win = Math.floor(bet*2.5); changeBalance(win); celebrateWin(win, bet); msgEl.textContent = `Blackjack! +${fmt(win)}`; }
+        else{ const win = luck(Math.floor(bet*2.5)); changeBalance(win); celebrateWin(win, bet); msgEl.textContent = `Blackjack! +${fmt(win)}`; }
         return;
       }
 
@@ -1782,8 +2502,8 @@
       const pVal = handValue(playerCards);
       const dVal = handValue(dealerCards);
 
-      if(dVal > 21){ changeBalance(bet*2); celebrateWin(bet*2, bet); msgEl.textContent = `Dealer Bust (${dVal}). Du gewinnst +${fmt(bet*2)}`; }
-      else if(pVal > dVal){ changeBalance(bet*2); celebrateWin(bet*2, bet); msgEl.textContent = `${pVal} schlägt ${dVal}. +${fmt(bet*2)}`; }
+      if(dVal > 21){ const w=luck(bet*2); changeBalance(w); celebrateWin(w, bet); msgEl.textContent = `Dealer Bust (${dVal}). Du gewinnst +${fmt(w)}`; }
+      else if(pVal > dVal){ const w=luck(bet*2); changeBalance(w); celebrateWin(w, bet); msgEl.textContent = `${pVal} schlägt ${dVal}. +${fmt(w)}`; }
       else if(pVal === dVal){ changeBalance(bet); msgEl.textContent = `Push bei ${pVal}.`; }
       else{ msgEl.textContent = `Dealer gewinnt ${dVal} gegen ${pVal}.`; }
     }
@@ -1955,7 +2675,7 @@
         resultNumEl.classList.remove('pop'); void resultNumEl.offsetWidth; resultNumEl.classList.add('pop');
         const mult = payoutMultiplier(selection.type, selection.val, resultNum);
         if(mult > 0){
-          const win = bet*(mult+1);
+          const win = luck(bet*(mult+1));
           changeBalance(win);
           celebrateWin(win, bet);
           msgEl.textContent = `${resultNum} — Treffer! +${fmt(win)}`;
@@ -2098,6 +2818,7 @@
         msgEl.textContent = 'Kein Treffer diesmal.';
       }
       if(win > 0){
+        win = luck(win);
         changeBalance(win);
         celebrateWin(win, bet);
         burstConfetti(win >= bet*10 ? 22 : 12);
@@ -2177,7 +2898,7 @@
         setTimeout(() => coinEl.classList.remove('landed'), 500);
         const win = result === pick;
         if(win){
-          const payout = bet*2;
+          const payout = luck(bet*2);
           changeBalance(payout);
           celebrateWin(payout, bet);
           msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Gewonnen! +${fmt(payout)}`;
@@ -2455,7 +3176,7 @@
           scatterMsg = ` 🪝×${scatterCount} — ${spinsLeft} Freispiele gestartet!`;
         }
 
-        const spinWin = lineWin + moneyWin;
+        const spinWin = luck(lineWin + moneyWin);
         if(inFreeSpins) freeSpinTotalWin += spinWin;
         if(spinWin > 0){
           changeBalance(spinWin);
@@ -2635,7 +3356,7 @@
       jumpBtn.disabled = true; cashoutBtn.disabled = true; startBtn.disabled = false;
       betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=false);
       if(win && step > 0){
-        const payout = Math.floor(bet * currentMulti());
+        const payout = luck(Math.floor(bet * currentMulti()));
         changeBalance(payout);
         celebrateWin(payout, bet);
         msgEl.textContent = `Ausgezahlt bei ${currentMulti().toFixed(2)}x — +${fmt(payout)}`;
