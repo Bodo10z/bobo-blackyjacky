@@ -267,6 +267,21 @@
     font-family:'JetBrains Mono',monospace; font-size:1.1rem; color: var(--gold-bright);
     background: var(--ink); border:1px solid var(--gold); border-radius:10px; padding: 10px 18px; min-width: 130px; text-align:center;
   }
+  .bet-input-label{
+    font-family:'JetBrains Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+    color: var(--gold); align-self:center;
+  }
+  .bet-input{
+    font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:700; color: var(--gold-bright);
+    background: var(--ink); border:1px solid var(--gold); border-radius:10px; padding: 10px 12px;
+    width: 100px; text-align:center;
+  }
+  .bet-input:focus{ outline: 2px solid var(--gold-bright); }
+  .allin-btn{ border-radius: 999px !important; background: var(--wine); color: var(--cream); font-weight:700; border-color: var(--wine-bright) !important; }
+  .allin-btn:hover{ background: var(--wine-bright); color: var(--cream) !important; }
+  #rlAuto.active, #slAuto.active, #cfAuto.active, #bfAuto.active{
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--ink); border:none;
+  }
 
   /* ---------- Blackjack ---------- */
   .hand{ display:flex; gap: -10px; justify-content:center; min-height: 108px; align-items:flex-end; }
@@ -415,6 +430,154 @@
   .pg-floe.fallen{ opacity: 0.3; }
   .pg-stat-row{ display:flex; justify-content:center; gap: 14px; margin: 8px 0 4px; flex-wrap:wrap; }
 
+  /* ---------- Reel strip animation (Slots) ---------- */
+  .reel{ position: relative; overflow: hidden; }
+  .reel.win-glow{ box-shadow: 0 0 0 3px var(--gold-bright), 0 0 26px 8px rgba(244,209,96,0.7); }
+  .reel-strip{ display:flex; flex-direction:column; will-change: transform; }
+  .reel-strip .sym{ width: 84px; height: 84px; display:flex; align-items:center; justify-content:center; font-size:2.6rem; flex-shrink:0; }
+  .reel-strip.spin{ animation: reel-scroll 0.18s linear infinite; filter: blur(1.5px); }
+  @keyframes reel-scroll{ from{ transform: translateY(0);} to{ transform: translateY(-84px);} }
+  .reel-strip.settle{ transition: transform 0.6s cubic-bezier(.2,.9,.25,1.4); filter:none; }
+  .slot-machine{ position: relative; }
+  .slot-machine.shake{ animation: sm-shake 0.5s ease; }
+  @keyframes sm-shake{
+    10%,90%{ transform: translateX(-2px);} 20%,80%{ transform: translateX(4px);}
+    30%,50%,70%{ transform: translateX(-8px);} 40%,60%{ transform: translateX(8px);}
+  }
+  .confetti-layer{ position:absolute; inset:0; pointer-events:none; overflow:visible; }
+  .confetti-piece{ position:absolute; top:50%; left:50%; font-size:1.3rem; animation: confetti-burst 1.1s ease-out forwards; }
+  @keyframes confetti-burst{
+    from{ transform: translate(-50%,-50%) translate(0,0) scale(1) rotate(0deg); opacity:1; }
+    to{ transform: translate(-50%,-50%) var(--dx,0px) var(--dy,-90px) scale(0.5) rotate(var(--rot,180deg)); opacity:0; }
+  }
+
+  /* ---------- AVATAR WIDGET ---------- */
+  .avatar-widget{
+    position: fixed; right: 16px; bottom: 16px; z-index: 40;
+    display: none; flex-direction: column; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .avatar-widget.visible{ display: flex; }
+  .avatar-speech{
+    position: relative; max-width: 190px; background: var(--cream); color: var(--ink);
+    font-family:'Inter',sans-serif; font-size: 0.78rem; font-weight:600; line-height:1.3;
+    padding: 8px 12px; border-radius: 12px; box-shadow: var(--shadow);
+    opacity: 0; transform: translateY(6px); transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+  }
+  .avatar-speech.show{ opacity: 1; transform: translateY(0); }
+  .avatar-speech::after{
+    content:''; position:absolute; bottom:-8px; right: 26px;
+    border-width: 8px 8px 0 8px; border-style: solid; border-color: var(--cream) transparent transparent transparent;
+  }
+  .avatar-stage{
+    width: 78px; height: 118px; position: relative;
+    background: radial-gradient(ellipse at 50% 100%, rgba(212,175,55,0.18), transparent 70%);
+    border-radius: 12px;
+    transition: transform 0.15s ease;
+  }
+  .avatar-widget:hover .avatar-stage{ transform: translateY(-3px) scale(1.04); }
+  .av-part{ position:absolute; left:50%; transform: translateX(-50%); }
+  .av-hair{ top: 2px; width: 46px; height: 26px; border-radius: 50% 50% 20% 20%/60% 60% 20% 20%; z-index: 3; background:#3b2a1a; }
+  .av-head{ top: 10px; width: 32px; height: 32px; border-radius: 50%; background: #e8b98a; z-index: 2; border: 1px solid #b8895d; }
+  .av-hat{ top: -10px; font-size: 1.5rem; z-index: 5; display:none; }
+  .av-torso{ top: 40px; width: 38px; height: 40px; border-radius: 10px 10px 6px 6px; background: #6b7280; z-index: 2; }
+  .av-top-overlay{ top: 40px; width: 40px; height: 40px; border-radius: 10px 10px 6px 6px; z-index: 3; display:none; align-items:center; justify-content:center; font-size:1.6rem; }
+  .av-legs{ top: 78px; width: 30px; height: 32px; background: #4b5563; border-radius: 4px; z-index: 2; }
+  .av-pants-overlay{ top: 78px; width: 32px; height: 32px; border-radius: 4px; z-index: 3; display:none; align-items:center; justify-content:center; font-size:1.3rem; }
+  .av-feet{ top: 106px; width: 34px; height: 8px; background: #3a3f47; border-radius: 4px; z-index: 2; }
+  .av-shoes-overlay{ top: 106px; width: 34px; height: 9px; border-radius: 4px; z-index: 3; display:none; align-items:center; justify-content:center; font-size:1rem; }
+  .av-item{ top: 52px; left: 68px; transform: none; font-size: 1.3rem; z-index: 4; display:none; }
+  .avatar-widget.gender-f .av-torso{ border-radius: 10px 10px 40% 40%; }
+  .avatar-widget.gender-f .av-hair{ height: 40px; border-radius: 50% 50% 30% 30%/60% 60% 40% 40%; }
+
+  /* ---------- MODALS (gender / ad / inventory / shop) ---------- */
+  .modal-overlay{
+    position: fixed; inset:0; z-index: 100; display:none; align-items:center; justify-content:center;
+    background: rgba(2,8,5,0.82); backdrop-filter: blur(3px); padding: 20px;
+  }
+  .modal-overlay.active{ display:flex; }
+  .modal-box{
+    background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(0,0,0,0.3)), var(--felt);
+    border: 1px solid var(--gold); border-radius: var(--radius); padding: 30px;
+    max-width: 420px; width: 100%; box-shadow: var(--shadow); text-align:center;
+    max-height: 86vh; overflow-y: auto;
+  }
+  .modal-box h2{ font-family:'Playfair Display',serif; color: var(--gold-bright); margin: 0 0 8px 0; }
+  .modal-box p{ color: rgba(237,230,214,0.75); font-size: 0.9rem; margin: 0 0 20px 0; }
+  .gender-choice-row{ display:flex; gap: 14px; justify-content:center; }
+  .gender-btn{
+    flex:1; padding: 22px 10px; border-radius: 12px; border: 1px solid var(--line);
+    background: rgba(0,0,0,0.25); color: var(--cream); cursor:pointer; font-family:'Inter',sans-serif; font-weight:600;
+    display:flex; flex-direction:column; align-items:center; gap:8px; transition: all 0.15s ease;
+  }
+  .gender-btn:hover{ border-color: var(--gold); background: rgba(212,175,55,0.1); }
+  .gender-btn span.emoji{ font-size: 2.2rem; }
+
+  .ad-box{ border-color: var(--wine-bright); position: relative; }
+  .ad-badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size: 0.65rem; letter-spacing:0.15em;
+    background: var(--wine-bright); color: var(--cream); padding: 3px 10px; border-radius: 999px; margin-bottom: 10px;
+  }
+  .ad-title{ font-family:'Playfair Display',serif; font-size: 1.5rem; color: var(--gold-bright); margin: 6px 0; }
+  .ad-fine{ font-size: 0.65rem; color: rgba(237,230,214,0.4); margin-top: 14px; }
+  .ad-close{
+    margin-top: 18px; font-family:'JetBrains Mono',monospace; font-size: 0.8rem;
+    background: var(--gold); color: var(--ink); border:none; padding: 10px 24px; border-radius: 999px;
+    cursor: pointer; font-weight:700;
+  }
+  .ad-close:disabled{ opacity: 0.4; cursor: not-allowed; }
+
+  /* Inventory */
+  .inv-tabs{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom: 16px; }
+  .inv-tab{
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent; color: var(--cream); cursor:pointer;
+  }
+  .inv-tab.active{ background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .inv-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .inv-item{
+    background: rgba(0,0,0,0.25); border: 1px solid var(--line); border-radius: 10px; padding: 12px 6px;
+    cursor:pointer; text-align:center; transition: all 0.15s ease;
+  }
+  .inv-item .inv-icon{ font-size: 1.8rem; display:block; margin-bottom: 4px; }
+  .inv-item .inv-name{ font-family:'JetBrains Mono',monospace; font-size: 0.62rem; color: rgba(237,230,214,0.7); }
+  .inv-item.equipped{ border-color: var(--gold-bright); box-shadow: 0 0 12px rgba(212,175,55,0.5); background: rgba(212,175,55,0.12); }
+  .inv-empty{ font-family:'JetBrains Mono',monospace; font-size:0.8rem; color: rgba(237,230,214,0.5); padding: 20px 0; grid-column: 1/-1; }
+  .modal-close-btn{
+    margin-top: 18px; background: transparent; border: 1px solid var(--line); color: var(--cream);
+    font-family:'Inter',sans-serif; padding: 9px 22px; border-radius: 999px; cursor:pointer;
+  }
+  .modal-close-btn:hover{ border-color: var(--gold); color: var(--gold-bright); }
+  .modal-topline{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px; }
+  .modal-balance{
+    font-family:'JetBrains Mono',monospace; font-size: 0.85rem; color: var(--gold-bright);
+  }
+
+  /* Shop */
+  .shop-cat{ margin-bottom: 18px; text-align:left; }
+  .shop-cat-title{
+    font-family:'JetBrains Mono',monospace; font-size: 0.7rem; text-transform:uppercase; letter-spacing:0.15em;
+    color: var(--gold); margin-bottom: 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px;
+  }
+  .shop-item-row{
+    display:flex; align-items:center; gap: 10px; padding: 8px 6px; border-radius: 8px;
+  }
+  .shop-item-row:hover{ background: rgba(212,175,55,0.06); }
+  .shop-item-row .shop-icon{ font-size: 1.5rem; width: 30px; text-align:center; }
+  .shop-item-row .shop-name{ flex:1; font-size: 0.85rem; }
+  .shop-item-row .shop-rare-tag{
+    font-family:'JetBrains Mono',monospace; font-size: 0.55rem; color: var(--wine-bright);
+    border: 1px solid var(--wine-bright); border-radius: 4px; padding: 1px 5px; margin-left: 4px;
+  }
+  .shop-buy-btn{
+    font-family:'JetBrains Mono',monospace; font-size: 0.7rem; font-weight:700; padding: 7px 14px;
+    border-radius: 999px; border: none; cursor: pointer; background: var(--gold); color: var(--ink);
+    white-space: nowrap;
+  }
+  .shop-buy-btn:disabled{ background: rgba(255,255,255,0.1); color: rgba(237,230,214,0.4); cursor:default; }
+  .shop-buy-btn.owned{ background: transparent; border: 1px solid var(--gold); color: var(--gold-bright); }
+
   footer.note{
     margin-top: 34px; font-family:'JetBrains Mono',monospace; font-size:0.68rem;
     color: rgba(237,230,214,0.4); text-align:center; max-width: 500px;
@@ -425,6 +588,74 @@
 
 <div class="felt-bg"></div>
 <div class="vignette"></div>
+
+<!-- AVATAR WIDGET (persistent, floating) -->
+<div class="avatar-widget" id="avatarWidget">
+  <div class="avatar-speech" id="avatarSpeech"></div>
+  <div class="avatar-stage" id="avatarStage">
+    <div class="av-part av-hat" id="avHat"></div>
+    <div class="av-part av-hair" id="avHair"></div>
+    <div class="av-part av-head"></div>
+    <div class="av-part av-torso"></div>
+    <div class="av-part av-top-overlay" id="avTop"></div>
+    <div class="av-part av-legs"></div>
+    <div class="av-part av-pants-overlay" id="avPants"></div>
+    <div class="av-part av-feet"></div>
+    <div class="av-part av-shoes-overlay" id="avShoes"></div>
+    <div class="av-part av-item" id="avItem"></div>
+  </div>
+</div>
+
+<!-- GENDER MODAL -->
+<div class="modal-overlay" id="genderModal">
+  <div class="modal-box">
+    <h2>Wer bist du?</h2>
+    <p>Für deinen Avatar im Haus.</p>
+    <div class="gender-choice-row">
+      <button class="gender-btn" id="pickMale"><span class="emoji">🧑</span>Mann</button>
+      <button class="gender-btn" id="pickFemale"><span class="emoji">👩</span>Frau</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAKE AD MODAL -->
+<div class="modal-overlay" id="adModal">
+  <div class="modal-box ad-box">
+    <span class="ad-badge">Werbung</span>
+    <div class="ad-title">🎉 DU BIST DER 1.000.000ste BESUCHER! 🎉</div>
+    <p>Klick jetzt und gewinne angeblich ein kostenloses iPhow 27 Ultra Pro Max™ (nicht wirklich, ist nur Deko).</p>
+    <button class="ad-close" id="adCloseBtn" disabled>Weiter in 3…</button>
+  </div>
+</div>
+
+<!-- INVENTORY MODAL -->
+<div class="modal-overlay" id="invModal">
+  <div class="modal-box">
+    <div class="modal-topline">
+      <h2 style="margin:0;">Kleiderschrank</h2>
+      <span class="modal-balance" id="invBalance"></span>
+    </div>
+    <p>Klick ein Teil zum An- oder Ausziehen.</p>
+    <div class="inv-tabs" id="invTabs"></div>
+    <div class="inv-grid" id="invGrid"></div>
+    <button class="modal-close-btn" id="invToShop">🛍️ Zum Shop</button>
+    <button class="modal-close-btn" id="invClose">Schließen</button>
+  </div>
+</div>
+
+<!-- SHOP MODAL -->
+<div class="modal-overlay" id="shopModal">
+  <div class="modal-box">
+    <div class="modal-topline">
+      <h2 style="margin:0;">Shop</h2>
+      <span class="modal-balance" id="shopBalance"></span>
+    </div>
+    <p>Wenige Teile, manche richtig teuer.</p>
+    <div id="shopList"></div>
+    <button class="modal-close-btn" id="shopClose">Schließen</button>
+  </div>
+</div>
+
 
 <!-- START SCREEN -->
 <section class="screen active" id="screen-start">
@@ -507,10 +738,12 @@
     <div class="hand" id="playerHand"></div>
     <div class="msg" id="bjMsg">Setz deinen Einsatz und klick „Geben“.</div>
     <div class="bet-row" id="bjBetRow">
-      <div class="bet-display">Einsatz: <span id="bjBetVal">0</span></div>
+      <span class="bet-input-label">Einsatz</span>
+      <input type="number" class="bet-input" id="bjBetVal" min="0" step="10" value="0">
       <button class="chip-btn" data-chip="10">+10</button>
       <button class="chip-btn" data-chip="50">+50</button>
       <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn allin-btn" data-chip="allin">All In</button>
       <button class="chip-btn" data-chip="clear">✕</button>
     </div>
     <div class="controls">
@@ -557,15 +790,18 @@
       </div>
     </div>
     <div class="msg" id="rlMsg">Wähl ein Feld, setz deinen Einsatz und dreh das Rad.</div>
-    <div class="bet-row">
-      <div class="bet-display">Einsatz: <span id="rlBetVal">0</span></div>
+    <div class="bet-row" id="rlBetRow">
+      <span class="bet-input-label">Einsatz</span>
+      <input type="number" class="bet-input" id="rlBetVal" min="0" step="10" value="0">
       <button class="chip-btn" data-chip="10">+10</button>
       <button class="chip-btn" data-chip="50">+50</button>
       <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn allin-btn" data-chip="allin">All In</button>
       <button class="chip-btn" data-chip="clear">✕</button>
     </div>
     <div class="controls">
       <button class="btn primary" id="rlSpin">Rad drehen</button>
+      <button class="btn" id="rlAuto">Autospin</button>
     </div>
   </div>
 </section>
@@ -580,21 +816,25 @@
     <div class="balance" id="balanceSL"><span class="chip-icon"></span><span id="balanceSLVal">1.000</span></div>
   </div>
   <div class="table-wrap" style="max-width:500px;">
-    <div class="slot-machine">
-      <div class="reel" id="reel0">🍒</div>
-      <div class="reel" id="reel1">🍒</div>
-      <div class="reel" id="reel2">🍒</div>
+    <div class="slot-machine" id="slMachine">
+      <div class="reel" id="reel0"><div class="reel-strip" id="strip0"><div class="sym">🍒</div></div></div>
+      <div class="reel" id="reel1"><div class="reel-strip" id="strip1"><div class="sym">🍒</div></div></div>
+      <div class="reel" id="reel2"><div class="reel-strip" id="strip2"><div class="sym">🍒</div></div></div>
+      <div class="confetti-layer" id="slConfetti"></div>
     </div>
     <div class="msg" id="slMsg">Einsatz wählen und Walzen drehen.</div>
-    <div class="bet-row">
-      <div class="bet-display">Einsatz: <span id="slBetVal">10</span></div>
+    <div class="bet-row" id="slBetRow">
+      <span class="bet-input-label">Einsatz</span>
+      <input type="number" class="bet-input" id="slBetVal" min="0" step="10" value="10">
       <button class="chip-btn" data-chip="10">+10</button>
       <button class="chip-btn" data-chip="50">+50</button>
       <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn allin-btn" data-chip="allin">All In</button>
       <button class="chip-btn" data-chip="clear">✕</button>
     </div>
     <div class="controls">
       <button class="btn primary" id="slSpin">Drehen</button>
+      <button class="btn" id="slAuto">Autospin</button>
     </div>
     <div class="paytable">
       <b>7️⃣7️⃣7️⃣</b> = 25x &nbsp; <b>💎💎💎</b> = 15x &nbsp; <b>🔔🔔🔔</b> = 8x<br>
@@ -625,14 +865,17 @@
       <button class="btn" id="cfPickTail">Zahl</button>
     </div>
     <div class="bet-row" id="cfBetRow">
-      <div class="bet-display">Einsatz: <span id="cfBetVal">10</span></div>
+      <span class="bet-input-label">Einsatz</span>
+      <input type="number" class="bet-input" id="cfBetVal" min="0" step="10" value="10">
       <button class="chip-btn" data-chip="10">+10</button>
       <button class="chip-btn" data-chip="50">+50</button>
       <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn allin-btn" data-chip="allin">All In</button>
       <button class="chip-btn" data-chip="clear">✕</button>
     </div>
     <div class="controls">
       <button class="btn primary" id="cfFlip">Werfen</button>
+      <button class="btn" id="cfAuto">Autospin</button>
     </div>
     <div class="paytable">Richtig getippt = <b>2x</b> Einsatz zurück.</div>
   </div>
@@ -654,19 +897,23 @@
     <div class="bf-grid" id="bfGrid"></div>
     <div class="msg" id="bfMsg">Einsatz wählen und Walzen drehen.</div>
     <div class="bet-row" id="bfBetRow">
-      <div class="bet-display">Einsatz: <span id="bfBetVal">10</span></div>
+      <span class="bet-input-label">Einsatz</span>
+      <input type="number" class="bet-input" id="bfBetVal" min="0" step="10" value="10">
       <button class="chip-btn" data-chip="10">+10</button>
       <button class="chip-btn" data-chip="50">+50</button>
       <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn allin-btn" data-chip="allin">All In</button>
       <button class="chip-btn" data-chip="clear">✕</button>
     </div>
     <div class="controls">
       <button class="btn primary" id="bfSpin">Drehen</button>
+      <button class="btn" id="bfAuto">Autospin</button>
     </div>
     <div class="paytable">
       🪝🪝🪝 (3+) = Freispiele (10/15/20) &nbsp;·&nbsp; 🎣 Angler ist Wild<br>
       💰 Geldfisch zeigt eigenen Wert — im Freispiel sammelt der Wild-Angler alle 💰 gleichzeitig ein<br>
-      Jeder 4. gesammelte Wild = +10 Freispiele & höherer Multiplikator (2x → 3x → 10x)
+      Jeder 4. gesammelte Wild = +10 Freispiele & höherer Multi (2x → 3x → 10x) — <b>quasi endlos, solange Wilds kommen</b><br>
+      Freispiele kosten keinen Einsatz — du kannst deinen Einsatz während der Freispiele jederzeit ändern
     </div>
   </div>
 </section>
@@ -690,10 +937,12 @@
       <div class="bet-display">Möglicher Gewinn: <span id="pgPotential">0</span></div>
     </div>
     <div class="bet-row" id="pgBetRow">
-      <div class="bet-display">Einsatz: <span id="pgBetVal">10</span></div>
+      <span class="bet-input-label">Einsatz</span>
+      <input type="number" class="bet-input" id="pgBetVal" min="0" step="10" value="10">
       <button class="chip-btn" data-chip="10">+10</button>
       <button class="chip-btn" data-chip="50">+50</button>
       <button class="chip-btn" data-chip="100">+100</button>
+      <button class="chip-btn allin-btn" data-chip="allin">All In</button>
       <button class="chip-btn" data-chip="clear">✕</button>
     </div>
     <div class="controls">
@@ -746,7 +995,9 @@
     screens.forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
-  document.getElementById('startBtn').addEventListener('click', () => showScreen('screen-menu'));
+  document.getElementById('startBtn').addEventListener('click', () => {
+    document.getElementById('genderModal').classList.add('active');
+  });
   document.querySelectorAll('[data-back]').forEach(btn => btn.addEventListener('click', () => showScreen('screen-menu')));
   document.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => showScreen('screen-' + card.dataset.game));
@@ -767,27 +1018,270 @@
     }
   })();
 
-  /* generic chip-bet helper: wires +10/+50/+100/clear buttons within a scope to a bet accumulator */
+  /* generic chip-bet helper: wires +10/+50/+100/allin/clear buttons and an optional
+     numeric input field (class="bet-input") within a scope to a bet accumulator */
   function wireChipButtons(scopeEl, getBet, setBet, onChange){
+    const input = scopeEl.querySelector('.bet-input');
+    function apply(bet){
+      if(isNaN(bet) || bet < 0) bet = 0;
+      bet = Math.floor(bet);
+      setBet(bet);
+      if(input) input.value = bet;
+      onChange(bet);
+    }
+    if(input){
+      input.addEventListener('input', () => apply(parseInt(input.value,10)));
+    }
     scopeEl.querySelectorAll('.chip-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const val = btn.dataset.chip;
         let bet = getBet();
         if(val === 'clear'){ bet = 0; }
+        else if(val === 'allin'){ bet = balance; }
         else{
           const amt = parseInt(val,10);
-          if(bet + amt > balance){ return; }
-          bet += amt;
+          bet = Math.min(bet + amt, balance);
         }
-        setBet(bet);
-        onChange(bet);
+        apply(bet);
       });
     });
   }
 
   /* ============================================================
-     BLACKJACK
+     AVATAR, SHOP & INTRO-FLOW (Gender-Auswahl -> Fake-Werbung -> Menü)
   ============================================================ */
+  const SHOP_ITEMS = {
+    hat: [
+      { id:'hat_cap', name:'Basecap', icon:'🧢', price:120 },
+      { id:'hat_top', name:'Zylinder', icon:'🎩', price:450 },
+      { id:'hat_crown', name:'Krone', icon:'👑', price:2600, rare:true },
+    ],
+    hair: [
+      { id:'hair_short', name:'Kurzhaar Braun', icon:'💇', color:'#3b2a1a', price:0 },
+      { id:'hair_curly', name:'Lockig Blond', icon:'💇', color:'#d4af37', price:300 },
+      { id:'hair_mohawk', name:'Irokese Pink', icon:'💇', color:'#ff2d95', price:900, rare:true },
+    ],
+    top: [
+      { id:'top_shirt', name:'T-Shirt', icon:'👕', color:'#3d6b8a', price:100 },
+      { id:'top_suit', name:'Anzug', icon:'🥼', color:'#1f2933', price:650 },
+      { id:'top_gold', name:'Goldjacke', icon:'🧥', color:'#d4af37', price:2400, rare:true },
+    ],
+    pants: [
+      { id:'pants_jeans', name:'Jeans', icon:'👖', color:'#2c4a6e', price:90 },
+      { id:'pants_chino', name:'Chinos', icon:'👖', color:'#6b5b3d', price:300 },
+      { id:'pants_gold', name:'Goldene Hose', icon:'👖', color:'#d4af37', price:1900, rare:true },
+    ],
+    shoes: [
+      { id:'shoes_sneaker', name:'Sneaker', icon:'👟', color:'#e8e8e8', price:110 },
+      { id:'shoes_leather', name:'Lederschuhe', icon:'👞', color:'#3a2418', price:380 },
+      { id:'shoes_diamond', name:'Diamantschuhe', icon:'💎', color:'#8fd9ff', price:2200, rare:true },
+    ],
+    item: [
+      { id:'item_coffee', name:'Kaffeebecher', icon:'☕', price:70 },
+      { id:'item_cane', name:'Gehstock', icon:'🦯', price:220 },
+      { id:'item_gold', name:'Goldbarren', icon:'🪙', price:1600, rare:true },
+    ],
+  };
+  const CAT_LABEL = { hat:'Hut', hair:'Haare', top:'Oberteil', pants:'Hose', shoes:'Schuhe', item:'Gegenstand' };
+  const CAT_ORDER = ['hat','hair','top','pants','shoes','item'];
+
+  const RENTNER_SPRUECHE = [
+    'Früher war hier alles Wiese!',
+    'Das Internet ist auch nur ne Modeerscheinung.',
+    'Bei uns wurde noch mit Groschen gezahlt!',
+    'Junge, zieh dir mal ne Jacke an, es zieht hier.',
+    'Damals hat man noch fürs Glücksspiel gearbeitet, nicht geklickt.',
+    'Meine Hüfte macht heut nicht mit.',
+    'So teuer? Zu meiner Zeit gabs das für n Groschen!',
+    'Warte, ich muss erst meine Lesebrille suchen…',
+    'Früher hat man Karten gespielt, echte Karten!',
+    'Die Rente reicht eh nicht, dann kann ich auch zocken.',
+    'Ich hab schon Verluste gemacht, da gabs noch kein Internet.',
+    'In meiner Zeit gabs nur Skat, aber gut.',
+    'Nicht so hektisch, junger Mann.',
+    'Ohje, mein Kreuz… aber weiterspielen!',
+    'Das nenn ich mal ne echte Rentner-Session.',
+  ];
+
+  let avatarGender = null;
+  const owned = { hat:[], hair:['hair_short'], top:[], pants:[], shoes:[], item:[] };
+  const equipped = { hat:null, hair:'hair_short', top:null, pants:null, shoes:null, item:null };
+
+  const avatarWidget = document.getElementById('avatarWidget');
+  const avatarSpeech = document.getElementById('avatarSpeech');
+  let speechTimer = null;
+
+  function rentnerSay(customLine){
+    if(!avatarWidget.classList.contains('visible')) return;
+    const line = customLine || RENTNER_SPRUECHE[Math.floor(Math.random()*RENTNER_SPRUECHE.length)];
+    avatarSpeech.textContent = line;
+    avatarSpeech.classList.add('show');
+    clearTimeout(speechTimer);
+    speechTimer = setTimeout(() => avatarSpeech.classList.remove('show'), 3200);
+  }
+
+  function findItem(cat, id){ return SHOP_ITEMS[cat].find(it => it.id === id); }
+
+  function renderAvatar(){
+    avatarWidget.classList.toggle('gender-f', avatarGender === 'f');
+    avatarWidget.classList.toggle('gender-m', avatarGender === 'm');
+
+    const hatEl = document.getElementById('avHat');
+    const hairEl = document.getElementById('avHair');
+    const topEl = document.getElementById('avTop');
+    const pantsEl = document.getElementById('avPants');
+    const shoesEl = document.getElementById('avShoes');
+    const itemEl = document.getElementById('avItem');
+
+    if(equipped.hat){ const it = findItem('hat', equipped.hat); hatEl.textContent = it.icon; hatEl.style.display = 'block'; }
+    else hatEl.style.display = 'none';
+
+    const hairIt = equipped.hair ? findItem('hair', equipped.hair) : null;
+    hairEl.style.background = hairIt ? hairIt.color : '#3b2a1a';
+
+    if(equipped.top){ const it = findItem('top', equipped.top); topEl.textContent = it.icon; topEl.style.background = it.color; topEl.style.display='flex'; }
+    else topEl.style.display = 'none';
+
+    if(equipped.pants){ const it = findItem('pants', equipped.pants); pantsEl.textContent = it.icon; pantsEl.style.background = it.color; pantsEl.style.display='flex'; }
+    else pantsEl.style.display = 'none';
+
+    if(equipped.shoes){ const it = findItem('shoes', equipped.shoes); shoesEl.textContent = it.icon; shoesEl.style.background = it.color; shoesEl.style.display='flex'; }
+    else shoesEl.style.display = 'none';
+
+    if(equipped.item){ const it = findItem('item', equipped.item); itemEl.textContent = it.icon; itemEl.style.display = 'block'; }
+    else itemEl.style.display = 'none';
+  }
+
+  /* ---- Intro flow: Gender -> Fake-Ad -> Menu ---- */
+  const genderModal = document.getElementById('genderModal');
+  const adModal = document.getElementById('adModal');
+  const adCloseBtn = document.getElementById('adCloseBtn');
+
+  function chooseGender(g){
+    avatarGender = g;
+    genderModal.classList.remove('active');
+    adModal.classList.add('active');
+    let count = 3;
+    adCloseBtn.disabled = true;
+    adCloseBtn.textContent = `Weiter in ${count}…`;
+    const timer = setInterval(() => {
+      count--;
+      if(count <= 0){
+        clearInterval(timer);
+        adCloseBtn.disabled = false;
+        adCloseBtn.textContent = '✕ Werbung schließen';
+      } else {
+        adCloseBtn.textContent = `Weiter in ${count}…`;
+      }
+    }, 1000);
+  }
+  document.getElementById('pickMale').addEventListener('click', () => chooseGender('m'));
+  document.getElementById('pickFemale').addEventListener('click', () => chooseGender('f'));
+  adCloseBtn.addEventListener('click', () => {
+    if(adCloseBtn.disabled) return;
+    adModal.classList.remove('active');
+    avatarWidget.classList.add('visible');
+    renderAvatar();
+    showScreen('screen-menu');
+    setTimeout(() => rentnerSay('Na, dann wollen wir mal die Bude aufmischen!'), 400);
+  });
+
+  /* ---- Inventory modal ---- */
+  const invModal = document.getElementById('invModal');
+  const invGrid = document.getElementById('invGrid');
+  const invTabs = document.getElementById('invTabs');
+  const invBalance = document.getElementById('invBalance');
+  let invActiveCat = 'hat';
+
+  function renderInvTabs(){
+    invTabs.innerHTML = '';
+    CAT_ORDER.forEach(cat => {
+      const tab = document.createElement('button');
+      tab.className = 'inv-tab' + (cat === invActiveCat ? ' active' : '');
+      tab.textContent = CAT_LABEL[cat];
+      tab.addEventListener('click', () => { invActiveCat = cat; renderInvTabs(); renderInvGrid(); });
+      invTabs.appendChild(tab);
+    });
+  }
+  function renderInvGrid(){
+    invGrid.innerHTML = '';
+    invBalance.textContent = fmt(balance) + ' Chips';
+    const ownedIds = owned[invActiveCat];
+    if(ownedIds.length === 0){
+      invGrid.innerHTML = '<div class="inv-empty">Noch nichts gekauft. Schau im Shop vorbei!</div>';
+      return;
+    }
+    ownedIds.forEach(id => {
+      const it = findItem(invActiveCat, id);
+      const cell = document.createElement('div');
+      cell.className = 'inv-item' + (equipped[invActiveCat] === id ? ' equipped' : '');
+      cell.innerHTML = `<span class="inv-icon">${it.icon}</span><span class="inv-name">${it.name}</span>`;
+      cell.addEventListener('click', () => {
+        equipped[invActiveCat] = (equipped[invActiveCat] === id) ? null : id;
+        renderAvatar(); renderInvGrid();
+      });
+      invGrid.appendChild(cell);
+    });
+  }
+  avatarWidget.addEventListener('click', () => {
+    invModal.classList.add('active');
+    renderInvTabs(); renderInvGrid();
+  });
+  document.getElementById('invClose').addEventListener('click', () => invModal.classList.remove('active'));
+  document.getElementById('invToShop').addEventListener('click', () => {
+    invModal.classList.remove('active');
+    openShop();
+  });
+
+  /* ---- Shop modal ---- */
+  const shopModal = document.getElementById('shopModal');
+  const shopList = document.getElementById('shopList');
+  const shopBalance = document.getElementById('shopBalance');
+
+  function openShop(){
+    shopModal.classList.add('active');
+    renderShop();
+  }
+  function renderShop(){
+    shopBalance.textContent = fmt(balance) + ' Chips';
+    shopList.innerHTML = '';
+    CAT_ORDER.forEach(cat => {
+      const block = document.createElement('div');
+      block.className = 'shop-cat';
+      const title = document.createElement('div');
+      title.className = 'shop-cat-title';
+      title.textContent = CAT_LABEL[cat];
+      block.appendChild(title);
+      SHOP_ITEMS[cat].forEach(it => {
+        const isOwned = owned[cat].includes(it.id);
+        const row = document.createElement('div');
+        row.className = 'shop-item-row';
+        row.innerHTML = `
+          <span class="shop-icon">${it.icon}</span>
+          <span class="shop-name">${it.name}${it.rare ? '<span class="shop-rare-tag">selten</span>' : ''}</span>
+        `;
+        const btn = document.createElement('button');
+        btn.className = 'shop-buy-btn' + (isOwned ? ' owned' : '');
+        if(isOwned){ btn.textContent = 'Besessen'; btn.disabled = true; }
+        else{
+          btn.textContent = it.price === 0 ? 'Gratis' : fmt(it.price);
+          btn.disabled = balance < it.price;
+          btn.addEventListener('click', () => {
+            if(balance < it.price) return;
+            changeBalance(-it.price);
+            owned[cat].push(it.id);
+            equipped[cat] = it.id;
+            renderAvatar(); renderShop();
+            rentnerSay('Sieht doch gleich schicker aus, was?');
+          });
+        }
+        row.appendChild(btn);
+        block.appendChild(row);
+      });
+      shopList.appendChild(block);
+    });
+  }
+  document.getElementById('shopClose').addEventListener('click', () => shopModal.classList.remove('active'));
   (function Blackjack(){
     const dealerHandEl = document.getElementById('dealerHand');
     const playerHandEl = document.getElementById('playerHand');
@@ -842,6 +1336,7 @@
       if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
       if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
       changeBalance(-bet);
+      rentnerSay();
       deck = freshDeck();
       dealerCards = [deck.pop(), deck.pop()];
       playerCards = [deck.pop(), deck.pop()];
@@ -1003,11 +1498,15 @@
       }
     }
 
-    spinBtn.addEventListener('click', () => {
-      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
-      if(!selection){ msgEl.textContent = 'Erst ein Feld auswählen.'; return; }
-      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+    let autoOn = false;
+    const autoBtn = document.getElementById('rlAuto');
+
+    function doRlSpin(onDone){
+      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; stopAuto(); return; }
+      if(!selection){ msgEl.textContent = 'Erst ein Feld auswählen.'; stopAuto(); return; }
+      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; stopAuto(); return; }
       changeBalance(-bet);
+      rentnerSay();
       spinBtn.disabled = true;
 
       const resultIdx = Math.floor(Math.random()*segCount);
@@ -1032,8 +1531,23 @@
           msgEl.textContent = `${resultNum} — kein Treffer.`;
         }
         spinBtn.disabled = false;
+        if(onDone) onDone();
       }, 4100);
+    }
+    function stopAuto(){
+      autoOn = false;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = 'Autospin';
+    }
+    autoBtn.addEventListener('click', () => {
+      if(autoOn){ stopAuto(); return; }
+      autoOn = true;
+      autoBtn.classList.add('active');
+      autoBtn.textContent = 'Stopp';
+      const loop = () => { if(autoOn) doRlSpin(() => setTimeout(loop, 700)); };
+      loop();
     });
+    spinBtn.addEventListener('click', () => doRlSpin());
   })();
 
   /* ============================================================
@@ -1057,56 +1571,124 @@
       return SYMBOLS[0].sym;
     }
 
-    const reels = [document.getElementById('reel0'), document.getElementById('reel1'), document.getElementById('reel2')];
+    const strips = [document.getElementById('strip0'), document.getElementById('strip1'), document.getElementById('strip2')];
+    const reelsEls = [document.getElementById('reel0'), document.getElementById('reel1'), document.getElementById('reel2')];
+    const machineEl = document.getElementById('slMachine');
+    const confettiLayer = document.getElementById('slConfetti');
     const betValEl = document.getElementById('slBetVal');
     const msgEl = document.getElementById('slMsg');
     const spinBtn = document.getElementById('slSpin');
+    const autoBtn = document.getElementById('slAuto');
     const tableWrap = document.querySelector('#screen-slots .table-wrap');
 
-    let bet = 10;
+    let bet = 10, spinning = false, autoOn = false;
     betValEl.textContent = fmt(bet);
     wireChipButtons(tableWrap, () => bet, v => { bet = v; }, v => { betValEl.textContent = fmt(v || 0); });
 
-    spinBtn.addEventListener('click', () => {
-      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
-      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+    function spinStrip(stripEl, finalSym, delay, onSettled){
+      stripEl.innerHTML = '';
+      const fillerCount = 10;
+      for(let i=0;i<fillerCount;i++){
+        const d = document.createElement('div'); d.className = 'sym'; d.textContent = pickSymbol();
+        stripEl.appendChild(d);
+      }
+      const finalDiv = document.createElement('div'); finalDiv.className = 'sym'; finalDiv.textContent = finalSym;
+      stripEl.appendChild(finalDiv);
+      stripEl.classList.remove('settle');
+      stripEl.style.transition = 'none';
+      stripEl.style.transform = 'translateY(0)';
+      void stripEl.offsetWidth;
+      stripEl.classList.add('spin');
+      setTimeout(() => {
+        stripEl.classList.remove('spin');
+        stripEl.classList.add('settle');
+        stripEl.style.transform = `translateY(-${fillerCount*84}px)`;
+        setTimeout(() => { onSettled && onSettled(); }, 620);
+      }, delay);
+    }
+
+    function burstConfetti(n){
+      confettiLayer.innerHTML = '';
+      const pieces = ['🎉','✨','💰','⭐'];
+      for(let i=0;i<n;i++){
+        const p = document.createElement('div');
+        p.className = 'confetti-piece';
+        p.textContent = pieces[Math.floor(Math.random()*pieces.length)];
+        const angle = Math.random()*2*Math.PI;
+        const dist = 60 + Math.random()*70;
+        p.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+        p.style.setProperty('--dy', (Math.sin(angle)*dist - 40) + 'px');
+        p.style.setProperty('--rot', (Math.random()*360) + 'deg');
+        p.style.animationDelay = (Math.random()*0.15) + 's';
+        confettiLayer.appendChild(p);
+      }
+      setTimeout(() => confettiLayer.innerHTML = '', 1300);
+    }
+
+    function doSlotSpin(onDone){
+      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; stopAuto(); return; }
+      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; stopAuto(); return; }
       changeBalance(-bet);
+      rentnerSay();
+      spinning = true;
       spinBtn.disabled = true;
+      reelsEls.forEach(r => r.classList.remove('win-glow'));
       msgEl.textContent = 'Walzen drehen…';
-      reels.forEach(r => r.classList.add('spinning'));
 
       const results = [pickSymbol(), pickSymbol(), pickSymbol()];
-      const delays = [700, 1050, 1400];
-      results.forEach((sym, i) => {
-        setTimeout(() => {
-          reels[i].classList.remove('spinning');
-          reels[i].textContent = sym;
-          if(i === 2) evaluateSpin(results);
-        }, delays[i]);
+      const delays = [650, 950, 1300];
+      let settledCount = 0;
+      strips.forEach((strip, i) => {
+        spinStrip(strip, results[i], delays[i], () => {
+          settledCount++;
+          if(settledCount === 3) evaluateSpin(results, onDone);
+        });
       });
-    });
+    }
 
-    function evaluateSpin(results){
+    function evaluateSpin(results, onDone){
       const [a,b,c] = results;
       let win = 0;
       if(a===b && b===c){
         win = bet * (PAYOUT[a] || 4);
         msgEl.textContent = `Drei ${a} — Volltreffer! +${fmt(win)}`;
+        reelsEls.forEach(r => r.classList.add('win-glow'));
       } else if(a===b || b===c || a===c){
-        // two cherries pay a small consolation, anything else two-match pays nothing extra
         const pair = (a===b) ? a : (b===c ? b : a);
         if(pair === '🍒'){
           win = Math.floor(bet*1.5);
           msgEl.textContent = `Zwei 🍒 — kleiner Gewinn! +${fmt(win)}`;
+          reelsEls.forEach(r => r.classList.add('win-glow'));
         } else {
           msgEl.textContent = 'Kein Treffer diesmal.';
         }
       } else {
         msgEl.textContent = 'Kein Treffer diesmal.';
       }
-      if(win > 0) changeBalance(win);
+      if(win > 0){
+        changeBalance(win);
+        burstConfetti(win >= bet*10 ? 22 : 12);
+        if(win >= bet*8){ machineEl.classList.remove('shake'); void machineEl.offsetWidth; machineEl.classList.add('shake'); }
+      }
+      spinning = false;
       spinBtn.disabled = false;
+      if(onDone) onDone();
     }
+
+    function stopAuto(){
+      autoOn = false;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = 'Autospin';
+    }
+    autoBtn.addEventListener('click', () => {
+      if(autoOn){ stopAuto(); return; }
+      autoOn = true;
+      autoBtn.classList.add('active');
+      autoBtn.textContent = 'Stopp';
+      const loop = () => { if(autoOn) doSlotSpin(() => setTimeout(loop, 500)); };
+      loop();
+    });
+    spinBtn.addEventListener('click', () => doSlotSpin());
   })();
 
   /* ============================================================
@@ -1134,10 +1716,14 @@
     pickHeadBtn.addEventListener('click', () => setPick('heads'));
     pickTailBtn.addEventListener('click', () => setPick('tails'));
 
-    flipBtn.addEventListener('click', () => {
-      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
-      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+    let autoOn = false;
+    const autoBtn = document.getElementById('cfAuto');
+
+    function doFlip(onDone){
+      if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; stopAuto(); return; }
+      if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; stopAuto(); return; }
       changeBalance(-bet);
+      rentnerSay();
       flipBtn.disabled = true; pickHeadBtn.disabled = true; pickTailBtn.disabled = true;
       betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=true);
 
@@ -1156,8 +1742,23 @@
         }
         flipBtn.disabled = false; pickHeadBtn.disabled = false; pickTailBtn.disabled = false;
         betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=false);
+        if(onDone) onDone();
       }, 1450);
+    }
+    function stopAuto(){
+      autoOn = false;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = 'Autospin';
+    }
+    autoBtn.addEventListener('click', () => {
+      if(autoOn){ stopAuto(); return; }
+      autoOn = true;
+      autoBtn.classList.add('active');
+      autoBtn.textContent = 'Stopp';
+      const loop = () => { if(autoOn) doFlip(() => setTimeout(loop, 500)); };
+      loop();
     });
+    flipBtn.addEventListener('click', () => doFlip());
   })();
 
   /* ============================================================
@@ -1295,14 +1896,14 @@
       multiEl.textContent = freeSpinMulti + 'x';
     }
 
-    function doSpin(auto){
+    function doSpin(onDone){
       if(!inFreeSpins){
-        if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
-        if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
+        if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; stopAuto(); return; }
+        if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; stopAuto(); return; }
         changeBalance(-bet);
       }
+      rentnerSay();
       spinBtn.disabled = true;
-      betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=true);
       msgEl.textContent = 'Walzen drehen…';
 
       setTimeout(() => {
@@ -1323,7 +1924,7 @@
               collected.add(key);
             }
             if(wildsCollected % 4 === 0){
-              spinsLeft += 10;
+              spinsLeft += 10; // no cap — as long as wilds keep landing, free spins keep piling up
               freeSpinMulti = freeSpinMulti === 2 ? 3 : (freeSpinMulti === 3 ? 10 : 10);
             }
           }
@@ -1352,24 +1953,35 @@
             msgEl.textContent = `Freispiele beendet. Gesamtgewinn: +${fmt(freeSpinTotalWin)}${scatterMsg}`;
             updateMeter();
           } else {
-            msgEl.textContent = (spinWin > 0 ? `+${fmt(spinWin)}` : 'Kein Treffer') + scatterMsg + ` — noch ${spinsLeft} Freispiele`;
+            msgEl.textContent = (spinWin > 0 ? `+${fmt(spinWin)}` : 'Kein Treffer') + scatterMsg + ` — noch ${spinsLeft} Freispiele (Einsatz frei änderbar)`;
           }
         } else {
           msgEl.textContent = spinWin > 0 ? `Gewonnen! +${fmt(spinWin)}${scatterMsg}` : ('Kein Treffer.' + scatterMsg);
         }
 
         spinBtn.disabled = false;
-        betRow.querySelectorAll('.chip-btn').forEach(b=>b.disabled=false);
-
-        if(inFreeSpins && spinsLeft > 0){
-          setTimeout(() => doSpin(true), 900);
-          spinBtn.disabled = true;
-        }
+        if(onDone) onDone();
       }, 550);
     }
 
+    let autoOn = false;
+    const autoBtn = document.getElementById('bfAuto');
+    function stopAuto(){
+      autoOn = false;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = 'Autospin';
+    }
+    autoBtn.addEventListener('click', () => {
+      if(autoOn){ stopAuto(); return; }
+      autoOn = true;
+      autoBtn.classList.add('active');
+      autoBtn.textContent = 'Stopp';
+      const loop = () => { if(autoOn) doSpin(() => setTimeout(loop, 500)); };
+      loop();
+    });
+
     updateMeter();
-    spinBtn.addEventListener('click', () => doSpin(false));
+    spinBtn.addEventListener('click', () => doSpin());
   })();
 
   /* ============================================================
@@ -1435,6 +2047,7 @@
       if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; return; }
       if(bet > balance){ msgEl.textContent = 'Nicht genug Chips.'; return; }
       changeBalance(-bet);
+      rentnerSay();
       active = true; step = 0;
       buildTrack(); updateTrackVisual(); refreshStats();
       msgEl.textContent = 'Der Pinguin steht bereit. Los geht’s!';
