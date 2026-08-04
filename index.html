@@ -247,6 +247,8 @@
     transition: all 0.15s ease;
   }
   .btn:hover:not(:disabled){ border-color: var(--gold); color: var(--gold-bright); transform: translateY(-1px); }
+  .btn:active:not(:disabled){ transform: translateY(0) scale(0.95); }
+  .chip-btn:active{ transform: translateY(-1px) scale(0.92); }
   .btn:disabled{ opacity: 0.35; cursor: not-allowed; }
   .btn.primary{ background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--ink); border:none; }
   .btn.primary:hover:not(:disabled){ color: var(--ink); }
@@ -316,6 +318,12 @@
     width:56px; height:56px; border-radius:50%; background: var(--ink); border:2px solid var(--gold);
     display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace;
     font-weight:700; font-size:1.2rem; color: var(--gold-bright);
+  }
+  .result-number.pop{ animation: result-pop 0.5s cubic-bezier(.17,.67,.3,1.5); }
+  @keyframes result-pop{
+    0%{ transform: translate(-50%,-50%) scale(0.4); box-shadow: 0 0 0 0 rgba(212,175,55,0.9); }
+    60%{ transform: translate(-50%,-50%) scale(1.25); }
+    100%{ transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 0 14px rgba(212,175,55,0); }
   }
   .bet-grid{
     display:grid; grid-template-columns: repeat(3, 46px); gap: 4px;
@@ -405,6 +413,21 @@
   }
   .bf-cell.collected{ outline: 3px solid var(--wine-bright); }
   @keyframes bf-drop{ from{ transform: translateY(-16px); opacity:0.4; } to{ transform:none; opacity:1; } }
+  .bf-grid-wrap{ position: relative; }
+  .bf-grid-wrap.shake{ animation: sm-shake 0.5s ease; }
+  .bf-cell.rattle{ animation: bf-rattle 0.08s linear infinite; filter: blur(1.5px); }
+  @keyframes bf-rattle{ 0%{ transform: translateY(-4px);} 50%{ transform: translateY(4px);} 100%{ transform: translateY(-4px);} }
+  .bf-cell.landed{ animation: bf-land 0.45s cubic-bezier(.17,.67,.3,1.4); }
+  @keyframes bf-land{
+    0%{ transform: translateY(-36px) scale(0.8); opacity:0.3; }
+    55%{ transform: translateY(8px) scale(1.06); opacity:1; }
+    100%{ transform: translateY(0) scale(1); opacity:1; }
+  }
+  .bf-cell.win-line{ animation: bf-win-pulse 0.9s ease-in-out infinite; }
+  @keyframes bf-win-pulse{
+    0%,100%{ box-shadow: 0 0 0 0 rgba(212,175,55,0.8); }
+    50%{ box-shadow: 0 0 0 6px rgba(212,175,55,0); }
+  }
 
   /* ---------- Penguin Ice Jump ---------- */
   .pg-track-wrap{
@@ -894,7 +917,10 @@
     <div class="bf-meter-wrap" id="bfMeterWrap" style="display:none;">
       <div class="bf-meter-label">Freispiele: <span id="bfSpinsLeft">0</span> · Wild-Zähler: <span id="bfWildCount">0</span>/4 · Multi: <span id="bfMulti">2x</span></div>
     </div>
-    <div class="bf-grid" id="bfGrid"></div>
+    <div class="bf-grid-wrap" id="bfGridWrap">
+      <div class="bf-grid" id="bfGrid"></div>
+      <div class="confetti-layer" id="bfConfetti"></div>
+    </div>
     <div class="msg" id="bfMsg">Einsatz wählen und Walzen drehen.</div>
     <div class="bet-row" id="bfBetRow">
       <span class="bet-input-label">Einsatz</span>
@@ -1318,15 +1344,15 @@
       return total;
     }
     function isRed(c){ return c.s === '♥' || c.s === '♦'; }
-    function renderCard(c, faceDown){
+    function renderCard(c, faceDown, justRevealed){
       const div = document.createElement('div');
-      div.className = 'card' + (faceDown ? ' back' : (isRed(c) ? ' red' : ''));
+      div.className = 'card' + (faceDown ? ' back' : (isRed(c) ? ' red' : '')) + (justRevealed ? ' flip-reveal' : '');
       if(!faceDown) div.innerHTML = `${c.r}<span style="font-size:1.6rem;line-height:1;">${c.s}</span>`;
       return div;
     }
-    function renderHands(){
+    function renderHands(justRevealedDealer){
       dealerHandEl.innerHTML = '';
-      dealerCards.forEach((c,i) => dealerHandEl.appendChild(renderCard(c, i===1 && dealerHidden)));
+      dealerCards.forEach((c,i) => dealerHandEl.appendChild(renderCard(c, i===1 && dealerHidden, i===1 && justRevealedDealer)));
       playerHandEl.innerHTML = '';
       playerCards.forEach(c => playerHandEl.appendChild(renderCard(c,false)));
       scoreEl.textContent = handValue(playerCards);
@@ -1361,12 +1387,12 @@
       let dVal = handValue(dealerCards);
 
       if(forced === 'bust'){
-        renderHands();
+        renderHands(true);
         msgEl.textContent = `Bust mit ${pVal}. Verloren.`;
         return;
       }
       if(forced === 'blackjack'){
-        renderHands();
+        renderHands(true);
         const dealerHasBJ = dealerCards.length===2 && handValue(dealerCards)===21;
         if(dealerHasBJ){ changeBalance(bet); msgEl.textContent = 'Beide Blackjack — Push.'; }
         else{ const win = Math.floor(bet*2.5); changeBalance(win); msgEl.textContent = `Blackjack! +${fmt(win)}`; }
@@ -1374,8 +1400,16 @@
       }
 
       // dealer draws to 17+
-      while(dVal < 17){ dealerCards.push(deck.pop()); dVal = handValue(dealerCards); }
-      renderHands();
+      renderHands(true);
+      setTimeout(() => {
+        while(dVal < 17){ dealerCards.push(deck.pop()); dVal = handValue(dealerCards); }
+        renderHands();
+        finishMessage();
+      }, 500);
+    }
+    function finishMessage(){
+      const pVal = handValue(playerCards);
+      const dVal = handValue(dealerCards);
 
       if(dVal > 21){ changeBalance(bet*2); msgEl.textContent = `Dealer Bust (${dVal}). Du gewinnst +${fmt(bet*2)}`; }
       else if(pVal > dVal){ changeBalance(bet*2); msgEl.textContent = `${pVal} schlägt ${dVal}. +${fmt(bet*2)}`; }
@@ -1522,6 +1556,7 @@
       setTimeout(() => {
         resultNumEl.textContent = resultNum;
         resultNumEl.style.color = resultNum===0 ? '#3fd47a' : (RED_NUMS.has(resultNum) ? '#ff5d6c' : '#ede6d6');
+        resultNumEl.classList.remove('pop'); void resultNumEl.offsetWidth; resultNumEl.classList.add('pop');
         const mult = payoutMultiplier(selection.type, selection.val, resultNum);
         if(mult > 0){
           const win = bet*(mult+1);
@@ -1896,6 +1931,61 @@
       multiEl.textContent = freeSpinMulti + 'x';
     }
 
+    const gridWrap = document.getElementById('bfGridWrap');
+    const bfConfettiLayer = document.getElementById('bfConfetti');
+
+    function burstConfettiBF(n){
+      bfConfettiLayer.innerHTML = '';
+      const pieces = ['🎉','✨','💰','⭐'];
+      for(let i=0;i<n;i++){
+        const p = document.createElement('div');
+        p.className = 'confetti-piece';
+        p.textContent = pieces[Math.floor(Math.random()*pieces.length)];
+        const angle = Math.random()*2*Math.PI;
+        const dist = 70 + Math.random()*100;
+        p.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+        p.style.setProperty('--dy', (Math.sin(angle)*dist - 50) + 'px');
+        p.style.setProperty('--rot', (Math.random()*360) + 'deg');
+        p.style.animationDelay = (Math.random()*0.15) + 's';
+        bfConfettiLayer.appendChild(p);
+      }
+      setTimeout(() => bfConfettiLayer.innerHTML = '', 1300);
+    }
+
+    /* classic slot-style "rattle down" reveal: each of the 5 reels rapidly
+       cycles random symbols, then stops left-to-right with a bounce landing */
+    function rattleAndReveal(finalGrid, onDone){
+      gridEl.innerHTML = '';
+      const cellRefs = [[],[],[],[],[]];
+      for(let row=0; row<3; row++){
+        for(let reel=0; reel<5; reel++){
+          const cell = document.createElement('div');
+          cell.className = 'bf-cell rattle';
+          cell.textContent = weightedSymbol();
+          gridEl.appendChild(cell);
+          cellRefs[reel][row] = cell;
+        }
+      }
+      let stoppedCount = 0;
+      for(let reel=0; reel<5; reel++){
+        const cycleTimer = setInterval(() => {
+          for(let row=0; row<3; row++) cellRefs[reel][row].textContent = weightedSymbol();
+        }, 65);
+        const stopDelay = 360 + reel*210;
+        setTimeout(() => {
+          clearInterval(cycleTimer);
+          for(let row=0; row<3; row++){
+            const cell = cellRefs[reel][row];
+            cell.classList.remove('rattle');
+            cell.classList.add('landed');
+            cell.textContent = finalGrid[reel][row];
+          }
+          stoppedCount++;
+          if(stoppedCount === 5) setTimeout(onDone, 200);
+        }, stopDelay);
+      }
+    }
+
     function doSpin(onDone){
       if(!inFreeSpins){
         if(bet <= 0){ msgEl.textContent = 'Erst einen Einsatz wählen.'; stopAuto(); return; }
@@ -1904,11 +1994,12 @@
       }
       rentnerSay();
       spinBtn.disabled = true;
-      msgEl.textContent = 'Walzen drehen…';
+      msgEl.textContent = 'Walzen rattern…';
 
-      setTimeout(() => {
-        const grid = buildGrid();
-        const moneyVals = assignMoneyValues(grid);
+      const grid = buildGrid();
+      const moneyVals = assignMoneyValues(grid);
+
+      rattleAndReveal(grid, () => {
         let lineWin = evaluateLines(grid);
         let moneyWin = 0;
         const collected = new Set();
@@ -1943,7 +2034,11 @@
 
         const spinWin = lineWin + moneyWin;
         if(inFreeSpins) freeSpinTotalWin += spinWin;
-        if(spinWin > 0) changeBalance(spinWin);
+        if(spinWin > 0){
+          changeBalance(spinWin);
+          burstConfettiBF(spinWin >= bet*15 ? 24 : 12);
+          if(spinWin >= bet*10){ gridWrap.classList.remove('shake'); void gridWrap.offsetWidth; gridWrap.classList.add('shake'); }
+        }
 
         if(inFreeSpins){
           spinsLeft--;
@@ -1961,7 +2056,7 @@
 
         spinBtn.disabled = false;
         if(onDone) onDone();
-      }, 550);
+      });
     }
 
     let autoOn = false;
