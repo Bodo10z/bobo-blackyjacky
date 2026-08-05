@@ -2135,6 +2135,11 @@
       defeat(){
         sequence([440, 370, 294, 220], 180, 'sawtooth', 0.13);
       },
+      achievement(){
+        tone(600, 0.06, { type:'sine', volume:0.08 });
+        setTimeout(() => sequence([784, 1047, 1568], 85, 'triangle', 0.15), 60);
+        setTimeout(() => tone(2093, 0.35, { type:'sine', volume:0.13 }), 320);
+      },
       openModal(){ tone(500, 0.12, { type:'sine', freqEnd:1200, volume:0.06 }); },
       closeModal(){ tone(700, 0.1, { type:'sine', freqEnd:300, volume:0.05 }); },
       chip(){ tone(1700, 0.05, { type:'sine', volume:0.09 }); setTimeout(()=>tone(2200,0.045,{type:'sine',volume:0.06}), 25); },
@@ -3171,7 +3176,7 @@
     st.unlocked = true;
     const a = ACHIEVEMENTS.find(x => x.id === id);
     showAchievementToast(a);
-    SoundEngine.buy();
+    SoundEngine.achievement();
     checkGoldenEnding();
   }
 
