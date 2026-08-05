@@ -1302,6 +1302,18 @@
   }
   body.golden-theme .golden-theme-overlay{ display:block; }
 
+  /* avatar shimmer unlockable via the "Bestangezogen" ticket — the character glitters gold */
+  .avatar-widget.shimmer-gold .avatar-stage{ filter: drop-shadow(0 0 16px rgba(212,175,55,0.9)); }
+  .avatar-widget.shimmer-gold .avatar-scale-wrap{ position: relative; }
+  .avatar-widget.shimmer-gold .avatar-scale-wrap::after{
+    content:''; position:absolute; inset:-14px; z-index:6; pointer-events:none;
+    background: linear-gradient(115deg, transparent 35%, rgba(255,240,180,0.85) 50%, transparent 65%);
+    background-size: 250% 250%;
+    animation: avatar-shimmer-sweep 2s linear infinite;
+    mix-blend-mode: overlay;
+  }
+  @keyframes avatar-shimmer-sweep{ 0%{ background-position: 200% 0; } 100%{ background-position: -200% 0; } }
+
 
 
 
@@ -3080,6 +3092,34 @@
       block.appendChild(row);
       shopList.appendChild(block);
     }
+
+    if(mode === 'free' && hasShimmerTicket && !avatarWidget.classList.contains('shimmer-gold')){
+      const block = document.createElement('div');
+      block.className = 'shop-cat';
+      const title = document.createElement('div');
+      title.className = 'shop-cat-title';
+      title.textContent = 'Mit Ticket einlösen';
+      block.appendChild(title);
+      const row = document.createElement('div');
+      row.className = 'shop-item-row legendaer';
+      row.innerHTML = `
+        <span class="shop-icon">🌟</span>
+        <span class="shop-name">Goldener Schimmer<span class="shop-legendary-tag">exklusiv</span></span>
+      `;
+      const btn = document.createElement('button');
+      btn.className = 'shop-buy-btn';
+      btn.textContent = '🎟️ Einlösen';
+      btn.addEventListener('click', () => {
+        hasShimmerTicket = false;
+        avatarWidget.classList.add('shimmer-gold');
+        SoundEngine.victory();
+        rentnerSay('Schau mich an, ich glitzere ja richtig!');
+        renderShop();
+      });
+      row.appendChild(btn);
+      block.appendChild(row);
+      shopList.appendChild(block);
+    }
   }
   document.getElementById('shopClose').addEventListener('click', () => shopModal.classList.remove('active'));
 
@@ -3092,17 +3132,17 @@
     { id:'slots_jackpot', icon:'🎰', name:'Volltreffer', desc:'Drei 7️⃣ auf einmal bei Slots', reward:500 },
     { id:'penguin_top', icon:'🐧', name:'Eiskalt', desc:'Bis zur letzten Eisscholle springen', reward:500 },
     { id:'bigfish_freespins', icon:'🎣', name:'Freispiel-Glück', desc:'Freispiele bei Fischfang Deluxe auslösen', reward:500 },
-    { id:'full_legendary', icon:'👑', name:'Bestangezogen', desc:'Ein legendäres Teil in jeder Kategorie tragen', reward:500 },
+    { id:'full_legendary', icon:'👑', name:'Bestangezogen', desc:'Ein legendäres Teil in jeder Kategorie tragen', reward:3000, ticket:'avatar_shimmer' },
     { id:'lucky_seven_master', icon:'🍀', name:'Geheimtipp', desc:'Das Lucky-Seven-Easter-Egg alle 5x nutzen', reward:500 },
-    { id:'big_earner', icon:'💰', name:'Großverdiener', desc:'Insgesamt 10.000 Chips gewinnen', reward:500 },
+    { id:'big_earner', icon:'💰', name:'Großverdiener', desc:'Insgesamt 10.000 Chips gewinnen', reward:1500 },
     { id:'all_in_win', icon:'🎲', name:'Alles auf eine Karte', desc:'Mit All-In gewinnen', reward:500 },
     { id:'boss_easy', icon:'🎩', name:'Der Croupier fällt', desc:'Boss auf Leicht besiegen', reward:1000 },
-    { id:'boss_medium', icon:'📋', name:'Der Buchmacher fällt', desc:'Boss auf Mittel besiegen', reward:1000 },
-    { id:'boss_hard', icon:'🏦', name:'Die Bank fällt', desc:'Boss auf Schwer besiegen', reward:2000 },
-    { id:'boss_extreme', icon:'👹', name:'Der Hausvorteil fällt', desc:'Boss auf Extrem besiegen', reward:3000 },
-    { id:'untouchable', icon:'🛡️', name:'Unantastbar', desc:'Die ersten beiden Bosse (Leicht & Mittel) besiegen, ohne einen einzigen Treffer zu kassieren', reward:5000 },
+    { id:'boss_medium', icon:'📋', name:'Der Buchmacher fällt', desc:'Boss auf Mittel besiegen', reward:2000 },
+    { id:'boss_hard', icon:'🏦', name:'Die Bank fällt', desc:'Boss auf Schwer besiegen', reward:4000 },
+    { id:'boss_extreme', icon:'👹', name:'Der Hausvorteil fällt', desc:'Boss auf Extrem besiegen', reward:6000 },
+    { id:'untouchable', icon:'🛡️', name:'Unantastbar', desc:'Die ersten beiden Bosse (Leicht & Mittel) besiegen, ohne einen einzigen Treffer zu kassieren', reward:10000 },
     { id:'boss_extreme_naked', icon:'💀', name:'Nacktes Grauen', desc:'Den Hausvorteil (Extrem) besiegen — komplett ohne Rüstung', reward:1000000 },
-    { id:'unstoppable', icon:'🔥', name:'Unaufhaltsam', desc:'Alle 4 Bosse besiegt haben UND den Hausvorteil danach nochmal ganz ohne Rüstung bezwingen', reward:0, special:'ticket' },
+    { id:'unstoppable', icon:'🔥', name:'Unaufhaltsam', desc:'Alle 4 Bosse besiegt haben UND den Hausvorteil danach nochmal ganz ohne Rüstung bezwingen', reward:0, ticket:'gold_theme' },
     { id:'golden_ending', icon:'🏁', name:'Das Goldene Ende', desc:'Alle anderen Achievements freigeschaltet haben', reward:0, special:'ending' },
   ];
   const achvState = {}; // id -> { unlocked: bool, claimed: bool }
@@ -3113,6 +3153,7 @@
   let totalWinnings = 0;
   let lastBetWasAllIn = false;
   let hasGoldenTicket = false;
+  let hasShimmerTicket = false;
 
   // boss-fight run tracking (reset each time a fight starts)
   let fightTookDamage = false;
@@ -3169,9 +3210,11 @@
   /* ---- Achievements book modal ---- */
   const achievementsModal = document.getElementById('achievementsModal');
   function rewardLabel(a, forRow){
-    if(a.special === 'ticket') return forRow ? '🎟️ Ticket' : 'Ticket';
     if(a.special === 'ending') return forRow ? '🏁 Ende' : 'Ende';
-    return `+${fmt(a.reward)}`;
+    const parts = [];
+    if(a.reward > 0) parts.push(`+${fmt(a.reward)}`);
+    if(a.ticket) parts.push('🎟️');
+    return parts.length ? parts.join(' ') : '—';
   }
   function renderAchievementsList(){
     const list = document.getElementById('achievementsList');
@@ -3186,22 +3229,29 @@
           <div class="achv-name">${a.name}</div>
           <div class="achv-desc">${a.desc}</div>
         </span>
-        <span class="achv-reward ${st.claimed ? 'done' : ''}">${st.claimed ? 'Abgeholt ✓' : (st.unlocked ? rewardLabel(a, true) + ' 🪙' : rewardLabel(a, true))}</span>
+        <span class="achv-reward ${st.claimed ? 'done' : ''}">${st.claimed ? 'Abgeholt ✓' : rewardLabel(a, true)}</span>
       `;
       if(st.unlocked && !st.claimed){
         row.addEventListener('click', () => {
           st.claimed = true;
-          if(a.special === 'ticket'){
-            hasGoldenTicket = true;
-            SoundEngine.buy();
-            rentnerSay('Ein goldenes Ticket! Damit geht bestimmt was im Shop.');
-          } else if(a.special === 'ending'){
+          if(a.special === 'ending'){
             SoundEngine.victory();
             showGoldenEndingScreen();
           } else {
-            creditFreePlayBalance(a.reward);
+            let said = false;
+            if(a.reward > 0){
+              creditFreePlayBalance(a.reward);
+              rentnerSay(`${fmt(a.reward)} Chips abgeholt, nicht schlecht!`);
+              said = true;
+            }
+            if(a.ticket === 'gold_theme'){
+              hasGoldenTicket = true;
+              if(!said) rentnerSay('Ein goldenes Ticket! Damit geht bestimmt was im Shop.');
+            } else if(a.ticket === 'avatar_shimmer'){
+              hasShimmerTicket = true;
+              if(!said) rentnerSay('Ein Ticket für dich! Schau mal im Shop vorbei.');
+            }
             SoundEngine.buy();
-            rentnerSay(`${fmt(a.reward)} Chips abgeholt, nicht schlecht!`);
           }
           renderAchievementsList();
         });
