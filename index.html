@@ -1268,6 +1268,41 @@
   .achv-desc{ font-family:'JetBrains Mono',monospace; font-size: 0.68rem; color: rgba(237,230,214,0.6); margin-top: 2px; }
   .achv-reward{ font-family:'JetBrains Mono',monospace; font-size: 0.75rem; font-weight:700; color: var(--gold-bright); white-space: nowrap; }
   .achv-reward.done{ color: rgba(237,230,214,0.4); }
+  .achv-row.achv-finale.unlocked{
+    border-color: #ff2d3d; background: linear-gradient(120deg, rgba(255,45,61,0.22), rgba(0,0,0,0.15));
+    box-shadow: 0 0 14px rgba(255,45,61,0.4);
+    animation: achv-glow-pulse-red 1.8s ease-in-out infinite;
+  }
+  @keyframes achv-glow-pulse-red{ 0%,100%{ box-shadow: 0 0 10px rgba(255,45,61,0.35); } 50%{ box-shadow: 0 0 22px rgba(255,45,61,0.7); } }
+  .achv-row.achv-finale .achv-reward{ color: #ff5d6c; }
+
+  .golden-ending-overlay{
+    position: fixed; inset:0; z-index: 300; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap: 18px;
+    background: radial-gradient(ellipse at 50% 40%, rgba(212,175,55,0.35), rgba(2,8,5,0.96) 70%);
+    animation: golden-ending-fade-in 0.6s ease;
+  }
+  @keyframes golden-ending-fade-in{ from{ opacity:0; } to{ opacity:1; } }
+  .golden-ending-title{
+    font-family:'Playfair Display', serif; font-weight:900; text-align:center; line-height:1.15;
+    font-size: clamp(1.8rem, 7vw, 3.6rem); color: #ff2d3d;
+    text-shadow: 0 0 30px rgba(255,45,61,0.8), 0 0 70px rgba(212,175,55,0.6);
+    animation: tier-blink 0.4s steps(1,end) infinite;
+  }
+  .golden-ending-sub{
+    font-family:'JetBrains Mono', monospace; letter-spacing:0.2em; text-transform:uppercase;
+    color: var(--gold-bright); font-size: 1.1rem; text-shadow: 0 0 16px rgba(244,209,96,0.7);
+  }
+
+  /* golden theme unlockable via the "Unaufhaltsam" ticket item — tints the entire app gold */
+  .golden-theme-overlay{
+    position: fixed; inset:0; z-index: 250; pointer-events:none; display:none;
+    background: radial-gradient(circle, rgba(255,221,130,0.55), rgba(212,175,55,0.4));
+    mix-blend-mode: color;
+  }
+  body.golden-theme .golden-theme-overlay{ display:block; }
+
+
 
 
 
@@ -1446,6 +1481,7 @@
 <button class="sound-toggle-btn" id="soundToggleBtn" title="Sound an/aus">🔊</button>
 
 <div class="achievement-toast-layer" id="achievementToastLayer"></div>
+<div class="golden-theme-overlay"></div>
 
 <div class="challenge-hud" id="challengeHud">
   <span class="challenge-hud-timer" id="challengeHudTimer">10:00</span>
@@ -2415,6 +2451,7 @@
         usesLeft--;
         changeBalance(10);
         celebrateWin(10, 10);
+        if(usesLeft <= 0) unlockAchievement('lucky_seven_master');
         rentnerSay(usesLeft > 0
           ? `10 Chips für dich! Noch ${usesLeft}x drin.`
           : '10 Chips für dich! Das war aber das letzte Mal.');
@@ -3015,6 +3052,34 @@
       });
       shopList.appendChild(block);
     });
+
+    if(mode === 'free' && hasGoldenTicket && !document.body.classList.contains('golden-theme')){
+      const block = document.createElement('div');
+      block.className = 'shop-cat';
+      const title = document.createElement('div');
+      title.className = 'shop-cat-title';
+      title.textContent = 'Mit Ticket einlösen';
+      block.appendChild(title);
+      const row = document.createElement('div');
+      row.className = 'shop-item-row legendaer';
+      row.innerHTML = `
+        <span class="shop-icon">✨</span>
+        <span class="shop-name">Goldener Anstrich<span class="shop-legendary-tag">exklusiv</span></span>
+      `;
+      const btn = document.createElement('button');
+      btn.className = 'shop-buy-btn';
+      btn.textContent = '🎟️ Einlösen';
+      btn.addEventListener('click', () => {
+        hasGoldenTicket = false;
+        document.body.classList.add('golden-theme');
+        SoundEngine.victory();
+        rentnerSay('Jetzt glänzt hier wirklich alles, was?');
+        renderShop();
+      });
+      row.appendChild(btn);
+      block.appendChild(row);
+      shopList.appendChild(block);
+    }
   }
   document.getElementById('shopClose').addEventListener('click', () => shopModal.classList.remove('active'));
 
@@ -3033,8 +3098,12 @@
     { id:'all_in_win', icon:'🎲', name:'Alles auf eine Karte', desc:'Mit All-In gewinnen', reward:500 },
     { id:'boss_easy', icon:'🎩', name:'Der Croupier fällt', desc:'Boss auf Leicht besiegen', reward:1000 },
     { id:'boss_medium', icon:'📋', name:'Der Buchmacher fällt', desc:'Boss auf Mittel besiegen', reward:1000 },
-    { id:'boss_hard', icon:'🏦', name:'Die Bank fällt', desc:'Boss auf Schwer besiegen', reward:1000 },
-    { id:'boss_extreme', icon:'👹', name:'Der Hausvorteil fällt', desc:'Boss auf Extrem besiegen', reward:1000 },
+    { id:'boss_hard', icon:'🏦', name:'Die Bank fällt', desc:'Boss auf Schwer besiegen', reward:2000 },
+    { id:'boss_extreme', icon:'👹', name:'Der Hausvorteil fällt', desc:'Boss auf Extrem besiegen', reward:3000 },
+    { id:'untouchable', icon:'🛡️', name:'Unantastbar', desc:'Die ersten beiden Bosse (Leicht & Mittel) besiegen, ohne einen einzigen Treffer zu kassieren', reward:5000 },
+    { id:'boss_extreme_naked', icon:'💀', name:'Nacktes Grauen', desc:'Den Hausvorteil (Extrem) besiegen — komplett ohne Rüstung', reward:1000000 },
+    { id:'unstoppable', icon:'🔥', name:'Unaufhaltsam', desc:'Alle 4 Bosse besiegt haben UND den Hausvorteil danach nochmal ganz ohne Rüstung bezwingen', reward:0, special:'ticket' },
+    { id:'golden_ending', icon:'🏁', name:'Das Goldene Ende', desc:'Alle anderen Achievements freigeschaltet haben', reward:0, special:'ending' },
   ];
   const achvState = {}; // id -> { unlocked: bool, claimed: bool }
   ACHIEVEMENTS.forEach(a => { achvState[a.id] = { unlocked:false, claimed:false }; });
@@ -3043,6 +3112,12 @@
   let coinHeadsStreak = 0;
   let totalWinnings = 0;
   let lastBetWasAllIn = false;
+  let hasGoldenTicket = false;
+
+  // boss-fight run tracking (reset each time a fight starts)
+  let fightTookDamage = false;
+  let fightHadAnyArmor = true; // recomputed at fight start from equipped gear
+  const flawlessBossWins = new Set();
 
   function creditFreePlayBalance(amount){
     if(mode === 'challenge'){ savedFreeBalance += amount; }
@@ -3056,6 +3131,12 @@
     const a = ACHIEVEMENTS.find(x => x.id === id);
     showAchievementToast(a);
     SoundEngine.buy();
+    checkGoldenEnding();
+  }
+
+  function checkGoldenEnding(){
+    const others = ACHIEVEMENTS.filter(a => a.id !== 'golden_ending');
+    if(others.every(a => achvState[a.id].unlocked)) unlockAchievement('golden_ending');
   }
 
   function showAchievementToast(a){
@@ -3087,32 +3168,58 @@
 
   /* ---- Achievements book modal ---- */
   const achievementsModal = document.getElementById('achievementsModal');
+  function rewardLabel(a, forRow){
+    if(a.special === 'ticket') return forRow ? '🎟️ Ticket' : 'Ticket';
+    if(a.special === 'ending') return forRow ? '🏁 Ende' : 'Ende';
+    return `+${fmt(a.reward)}`;
+  }
   function renderAchievementsList(){
     const list = document.getElementById('achievementsList');
     list.innerHTML = '';
     ACHIEVEMENTS.forEach(a => {
       const st = achvState[a.id];
       const row = document.createElement('div');
-      row.className = 'achv-row ' + (st.claimed ? 'claimed' : st.unlocked ? 'unlocked' : 'locked');
+      row.className = 'achv-row ' + (st.claimed ? 'claimed' : st.unlocked ? 'unlocked' : 'locked') + (a.id === 'golden_ending' ? ' achv-finale' : '');
       row.innerHTML = `
         <span class="achv-icon">${st.unlocked ? a.icon : '🔒'}</span>
         <span class="achv-info">
           <div class="achv-name">${a.name}</div>
           <div class="achv-desc">${a.desc}</div>
         </span>
-        <span class="achv-reward ${st.claimed ? 'done' : ''}">${st.claimed ? 'Abgeholt ✓' : (st.unlocked ? `+${fmt(a.reward)} 🪙` : `+${fmt(a.reward)}`)}</span>
+        <span class="achv-reward ${st.claimed ? 'done' : ''}">${st.claimed ? 'Abgeholt ✓' : (st.unlocked ? rewardLabel(a, true) + ' 🪙' : rewardLabel(a, true))}</span>
       `;
       if(st.unlocked && !st.claimed){
         row.addEventListener('click', () => {
           st.claimed = true;
-          creditFreePlayBalance(a.reward);
-          SoundEngine.buy();
-          rentnerSay(`${fmt(a.reward)} Chips abgeholt, nicht schlecht!`);
+          if(a.special === 'ticket'){
+            hasGoldenTicket = true;
+            SoundEngine.buy();
+            rentnerSay('Ein goldenes Ticket! Damit geht bestimmt was im Shop.');
+          } else if(a.special === 'ending'){
+            SoundEngine.victory();
+            showGoldenEndingScreen();
+          } else {
+            creditFreePlayBalance(a.reward);
+            SoundEngine.buy();
+            rentnerSay(`${fmt(a.reward)} Chips abgeholt, nicht schlecht!`);
+          }
           renderAchievementsList();
         });
       }
       list.appendChild(row);
     });
+  }
+  function showGoldenEndingScreen(){
+    achievementsModal.classList.remove('active');
+    const overlay = document.createElement('div');
+    overlay.className = 'golden-ending-overlay';
+    overlay.innerHTML = `
+      <div class="golden-ending-title">DU HAST DAS SPIEL<br>DURCHGESPIELT</div>
+      <div class="golden-ending-sub">★ Das Goldene Ende ★</div>
+      <button class="btn primary" id="goldenEndingCloseBtn">Weiterspielen</button>
+    `;
+    document.body.appendChild(overlay);
+    document.getElementById('goldenEndingCloseBtn').addEventListener('click', () => overlay.remove());
   }
   document.getElementById('openAchievementsBtn').addEventListener('click', () => {
     renderAchievementsList();
@@ -3314,6 +3421,8 @@
     const diff = DIFFICULTIES[challengeDifficulty];
     bossState = { hp: diff.boss.hp, maxHp: diff.boss.hp };
     playerHp = playerMaxHp = 100;
+    fightTookDamage = false;
+    fightHadAnyArmor = ['hat','hair','top','pants','shoes'].some(cat => !!challengeEquipped[cat]);
     document.getElementById('bossFightTitle').textContent = diff.boss.name;
     document.getElementById('bossName').textContent = diff.boss.name;
     const visualEl = document.getElementById('bossVisual');
@@ -3476,6 +3585,7 @@
       const rawDmg = diff.boss.dmgMin + Math.random()*(diff.boss.dmgMax - diff.boss.dmgMin);
       const dmg = Math.round(rawDmg * (1 - stats.dmgReduction/100));
       playerHp = Math.max(0, playerHp - dmg);
+      fightTookDamage = true;
       updatePlayerHpUI();
       SoundEngine.hitTaken();
       bossMsgEl.textContent = `${diff.boss.name} trifft dich! -${dmg} HP`;
@@ -3503,6 +3613,20 @@
     if(win){ SoundEngine.victory(); } else { SoundEngine.defeat(); }
     if(win){
       sub.textContent = `Du hast ${diff.boss.name} bezwungen!`;
+      const bossAchvId = { easy:'boss_easy', medium:'boss_medium', hard:'boss_hard', extreme:'boss_extreme' }[diff.key];
+      if(bossAchvId) unlockAchievement(bossAchvId);
+
+      if(!fightTookDamage && (diff.key === 'easy' || diff.key === 'medium')){
+        flawlessBossWins.add(diff.key);
+        if(flawlessBossWins.has('easy') && flawlessBossWins.has('medium')) unlockAchievement('untouchable');
+      }
+
+      if(diff.key === 'extreme' && !fightHadAnyArmor){
+        unlockAchievement('boss_extreme_naked');
+        if(achvState.boss_easy.unlocked && achvState.boss_medium.unlocked && achvState.boss_hard.unlocked && achvState.boss_extreme.unlocked){
+          unlockAchievement('unstoppable');
+        }
+      }
     } else {
       const lines = BOSS_VOICES[diff.key].onVictory;
       sub.textContent = `${diff.boss.name}: „${lines[Math.floor(Math.random()*lines.length)]}"`;
