@@ -948,12 +948,6 @@
     position: fixed; top: 38vh; left:0; right:0; z-index: 91;
     display:flex; justify-content:center; pointer-events:none;
   }
-  .win-tier-label{
-    font-family:'JetBrains Mono', monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;
-    text-align:center; opacity:0; white-space: nowrap;
-    padding: 12px 34px; border-radius: 999px;
-    border: 2px solid rgba(255,255,255,0.35);
-  }
   .win-tier-label.show{
     animation: tier-label-in 0.35s cubic-bezier(.2,1.8,.4,1) forwards,
                tier-blink 0.22s steps(1,end) infinite 0.35s,
@@ -965,26 +959,33 @@
   @keyframes tier-blink{ 0%,38%,42%,100%{ filter: brightness(1); } 40%{ filter: brightness(2.2); } }
   @keyframes tier-wobble{ 0%,100%{ transform: rotate(-1.5deg) scale(1); } 50%{ transform: rotate(1.5deg) scale(1.04); } }
 
+  .win-tier-label{
+    font-family:'JetBrains Mono', monospace; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;
+    text-align:center; opacity:0; white-space: nowrap;
+    padding: 8px 20px; border-radius: 999px;
+    border: 2px solid rgba(255,255,255,0.35);
+    max-width: 92vw; overflow: hidden; text-overflow: ellipsis;
+  }
   .win-tier-label.tier1{
-    font-size: 2rem; color: #fff6d8;
+    font-size: clamp(1.1rem, 6vw, 2rem); color: #fff6d8;
     background: linear-gradient(100deg, #f4d160, #b8860b, #f4d160);
     background-size: 250% 100%;
     box-shadow: 0 0 24px rgba(244,209,96,0.75), 0 4px 12px rgba(0,0,0,0.5);
   }
   .win-tier-label.tier2{
-    font-size: 2.6rem; color: #fff;
+    font-size: clamp(1.3rem, 7vw, 2.6rem); color: #fff;
     background: linear-gradient(100deg, #ff9d3f, #d9660b, #ff9d3f);
     background-size: 250% 100%;
     box-shadow: 0 0 30px rgba(255,157,63,0.85), 0 4px 14px rgba(0,0,0,0.5);
   }
   .win-tier-label.tier3{
-    font-size: 3.2rem; color: #fff;
+    font-size: clamp(1.5rem, 8vw, 3.2rem); color: #fff;
     background: linear-gradient(100deg, #ff5d6c, #a8283a, #ff5d6c);
     background-size: 250% 100%;
     box-shadow: 0 0 38px rgba(255,93,108,0.9), 0 4px 16px rgba(0,0,0,0.55);
   }
   .win-tier-label.tier4{
-    font-size: 4rem; color: #fff;
+    font-size: clamp(1.7rem, 9vw, 4rem); color: #fff;
     background: linear-gradient(90deg, #f4d160, #ff5d6c, #6ea8ff, #7ec98f, #f4d160);
     background-size: 300% 100%;
     box-shadow: 0 0 54px rgba(244,209,96,0.95), 0 0 100px rgba(255,93,108,0.55), 0 4px 18px rgba(0,0,0,0.6);
@@ -1235,7 +1236,7 @@
     background: linear-gradient(160deg, rgba(212,175,55,0.2), rgba(0,0,0,0.35)), var(--ink);
     border: 2px solid var(--gold-bright); border-radius: 12px; padding: 10px 16px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(212,175,55,0.4);
-    max-width: 300px; transform: translateX(-120%); opacity: 0;
+    max-width: min(300px, calc(100vw - 32px)); transform: translateX(-120%); opacity: 0;
     animation: toast-in-out 4.5s ease forwards;
   }
   @keyframes toast-in-out{
@@ -1275,6 +1276,26 @@
   }
   @keyframes achv-glow-pulse-red{ 0%,100%{ box-shadow: 0 0 10px rgba(255,45,61,0.35); } 50%{ box-shadow: 0 0 22px rgba(255,45,61,0.7); } }
   .achv-row.achv-finale .achv-reward{ color: #ff5d6c; }
+
+  .freespins-summary-overlay{
+    position: fixed; inset:0; z-index: 280; display:flex; align-items:center; justify-content:center;
+    background: rgba(2,8,5,0.9); backdrop-filter: blur(4px); padding: 20px;
+    animation: golden-ending-fade-in 0.4s ease;
+  }
+  .freespins-summary-box{
+    background: linear-gradient(160deg, rgba(212,175,55,0.15), rgba(0,0,0,0.4)), var(--felt);
+    border: 2px solid var(--gold-bright); border-radius: 20px; padding: 34px 28px;
+    max-width: 380px; width: 100%; text-align:center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(212,175,55,0.4);
+  }
+  .freespins-summary-title{
+    font-family:'Playfair Display', serif; font-weight:900; font-size: 1.6rem; color: var(--gold-bright);
+    margin-bottom: 14px;
+  }
+  .freespins-summary-amount{
+    font-family:'JetBrains Mono', monospace; font-size: 1rem; color: var(--cream); margin-bottom: 24px;
+  }
+  .freespins-summary-amount span{ color: var(--gold-bright); font-weight:800; font-size: 1.3rem; }
 
   .golden-ending-overlay{
     position: fixed; inset:0; z-index: 300; display:flex; flex-direction:column;
@@ -1521,6 +1542,17 @@
       <button class="gender-btn" id="pickMale"><span class="emoji">🧑</span>Mann</button>
       <button class="gender-btn" id="pickFemale"><span class="emoji">👩</span>Frau</button>
     </div>
+  </div>
+</div>
+
+<!-- GAMERTAG MODAL -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal-box">
+    <h2>Wie sollen wir dich nennen?</h2>
+    <p>Dein Gamertag — wird im Spiel und ganz am Ende gebraucht.</p>
+    <input type="text" class="bet-input" id="gamertagInput" maxlength="16" placeholder="Gamertag"
+      style="width:100%; text-align:center; font-size:1.1rem; margin-bottom:16px;">
+    <button class="btn primary" id="gamertagSubmitBtn" style="width:100%;">Weiter</button>
   </div>
 </div>
 
@@ -1985,7 +2017,7 @@
     <div class="paytable">
       🪝🪝🪝 (3+) = Freispiele (10/15/20), <b>~3,6% Chance pro Spin</b> &nbsp;·&nbsp; 🎣 Angler ist Wild<br>
       💰 Geldfisch zeigt eigenen Wert — im Freispiel sammelt der Wild-Angler alle 💰 gleichzeitig ein<br>
-      Jeder 4. gesammelte Wild = +10 Freispiele & höherer Multi (2x → 3x → 10x) — <b>nur ~1% Chance pro Freispiel auf einen Wild</b><br>
+      Jeder 4. gesammelte Wild = +10 Freispiele & höherer Multi (2x → 3x → 10x) — <b>max. 2 Retrigger pro Freispielrunde</b><br>
       Freispiele kosten keinen Einsatz — du kannst deinen Einsatz während der Freispiele jederzeit ändern
     </div>
   </div>
@@ -2341,7 +2373,7 @@
     if(typeof totalWinnings !== 'undefined'){
       totalWinnings += amount;
       if(totalWinnings >= 10000) unlockAchievement('big_earner');
-      if(lastBetWasAllIn) unlockAchievement('all_in_win');
+      if(lastBetWasAllIn){ unlockAchievement('all_in_win'); lastBetWasAllIn = false; }
     }
 
     if(!winFlashEl){ winFlashEl = document.createElement('div'); winFlashEl.className = 'win-flash'; document.body.appendChild(winFlashEl); }
@@ -2506,6 +2538,8 @@
     name => `${name}? Meine Rente hätt ich da auch fast verzockt.`,
     name => `Immer diese Hektik. Na gut, ${name} halt.`,
     name => `Ob das gut geht, bei ${name}…`,
+    name => `Na ${playerName}, ${name} also. Mal sehen.`,
+    name => `${playerName}, du und ${name} — das kann was werden.`,
   ];
   document.querySelectorAll('#screen-menu .game-card[data-game]').forEach(card => {
     card.addEventListener('click', () => {
@@ -2884,7 +2918,9 @@
     const delay = 10000 + Math.random()*15000; // every ~10-25s
     setTimeout(() => {
       if(avatarWidget.classList.contains('visible') && !avatarSpeech.classList.contains('show') && Math.random() < 0.6){
-        rentnerSay(IDLE_SPRUECHE[Math.floor(Math.random()*IDLE_SPRUECHE.length)]);
+        let line = IDLE_SPRUECHE[Math.floor(Math.random()*IDLE_SPRUECHE.length)];
+        if(Math.random() < 0.3){ line = `${playerName}, ${line.charAt(0).toLowerCase()}${line.slice(1)}`; }
+        rentnerSay(line);
       }
       scheduleIdleChatter();
     }, delay);
@@ -2943,23 +2979,38 @@
     return { dmgReduction: Math.min(dmgReduction, 78), dmgBonus };
   }
 
-  /* ---- Intro flow: Gender -> Age check -> Menu ---- */
+  /* ---- Intro flow: Gender -> Gamertag -> Age check -> Menu ---- */
   const genderModal = document.getElementById('genderModal');
+  const nameModal = document.getElementById('nameModal');
   const adModal = document.getElementById('adModal');
+  let playerName = 'Spieler';
 
   function chooseGender(g){
     avatarGender = g;
     genderModal.classList.remove('active');
-    adModal.classList.add('active');
+    nameModal.classList.add('active');
+    setTimeout(() => document.getElementById('gamertagInput').focus(), 200);
   }
   document.getElementById('pickMale').addEventListener('click', () => chooseGender('m'));
   document.getElementById('pickFemale').addEventListener('click', () => chooseGender('f'));
+
+  function submitGamertag(){
+    const val = document.getElementById('gamertagInput').value.trim();
+    playerName = val ? val.slice(0, 16) : 'Spieler';
+    nameModal.classList.remove('active');
+    adModal.classList.add('active');
+  }
+  document.getElementById('gamertagSubmitBtn').addEventListener('click', submitGamertag);
+  document.getElementById('gamertagInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') submitGamertag();
+  });
+
   document.getElementById('ageYesBtn').addEventListener('click', () => {
     adModal.classList.remove('active');
     avatarWidget.classList.add('visible');
     renderAvatar();
     showScreen('screen-mode-select');
-    setTimeout(() => rentnerSay('Na, dann wollen wir mal die Bude aufmischen!'), 400);
+    setTimeout(() => rentnerSay(`Na ${playerName}, dann wollen wir mal die Bude aufmischen!`), 400);
   });
   document.getElementById('ageNoBtn').addEventListener('click', () => {
     adModal.classList.remove('active');
@@ -3270,7 +3321,7 @@
     const overlay = document.createElement('div');
     overlay.className = 'golden-ending-overlay';
     overlay.innerHTML = `
-      <div class="golden-ending-title">DU HAST DAS SPIEL<br>DURCHGESPIELT</div>
+      <div class="golden-ending-title">${playerName}<br>DU HAST DAS SPIEL<br>DURCHGESPIELT</div>
       <div class="golden-ending-sub">★ Das Goldene Ende ★</div>
       <button class="btn primary" id="goldenEndingCloseBtn">Weiterspielen</button>
     `;
@@ -3839,13 +3890,14 @@
       if(forced === 'bust'){
         renderHands(true);
         SoundEngine.lose();
+        lastBetWasAllIn = false;
         msgEl.textContent = `Bust mit ${pVal}. Verloren.`;
         return;
       }
       if(forced === 'blackjack'){
         renderHands(true);
         const dealerHasBJ = dealerCards.length===2 && handValue(dealerCards)===21;
-        if(dealerHasBJ){ changeBalance(bet); msgEl.textContent = 'Beide Blackjack — Push.'; }
+        if(dealerHasBJ){ changeBalance(bet); lastBetWasAllIn = false; msgEl.textContent = 'Beide Blackjack — Push.'; }
         else{ const win = luck(Math.floor(bet*2.5)); changeBalance(win); celebrateWin(win, bet); msgEl.textContent = `Blackjack! +${fmt(win)}`; }
         return;
       }
@@ -3870,8 +3922,8 @@
 
       if(dVal > 21){ const w=luck(bet*2); changeBalance(w); celebrateWin(w, bet); msgEl.textContent = `Dealer Bust (${dVal}). Du gewinnst +${fmt(w)}`; }
       else if(pVal > dVal){ const w=luck(bet*2); changeBalance(w); celebrateWin(w, bet); msgEl.textContent = `${pVal} schlägt ${dVal}. +${fmt(w)}`; }
-      else if(pVal === dVal){ changeBalance(bet); msgEl.textContent = `Extrem seltener Gleichstand bei ${pVal} — Einsatz zurück.`; }
-      else{ msgEl.textContent = `Dealer gewinnt ${dVal} gegen ${pVal}.`; }
+      else if(pVal === dVal){ changeBalance(bet); lastBetWasAllIn = false; msgEl.textContent = `Extrem seltener Gleichstand bei ${pVal} — Einsatz zurück.`; }
+      else{ lastBetWasAllIn = false; msgEl.textContent = `Dealer gewinnt ${dVal} gegen ${pVal}.`; }
     }
 
     dealBtn.addEventListener('click', startRound);
@@ -4050,6 +4102,7 @@
           msgEl.textContent = `${resultNum} — Treffer! +${fmt(win)}`;
         }else{
           SoundEngine.lose();
+          lastBetWasAllIn = false;
           msgEl.textContent = `${resultNum} — kein Treffer.`;
         }
         spinBtn.disabled = false;
@@ -4191,10 +4244,12 @@
           reelsEls.forEach(r => r.classList.add('win-glow'));
         } else {
           SoundEngine.lose();
+          lastBetWasAllIn = false;
           msgEl.textContent = 'Kein Treffer diesmal.';
         }
       } else {
         SoundEngine.lose();
+        lastBetWasAllIn = false;
         msgEl.textContent = 'Kein Treffer diesmal.';
       }
       if(win > 0){
@@ -4298,6 +4353,7 @@
           msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Gewonnen! +${fmt(payout)}`;
         }else{
           SoundEngine.lose();
+          lastBetWasAllIn = false;
           msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Verloren.`;
         }
         flipBtn.disabled = false; pickHeadBtn.disabled = false; pickTailBtn.disabled = false;
@@ -4330,12 +4386,12 @@
   ============================================================ */
   (function BigFishSlot(){
     const LOW = ['9','10','J','Q','K','A'];
-    const LOW_PAY = { '9':2, '10':2, 'J':3, 'Q':3, 'K':4, 'A':5 }; // per 3-match, scales x for 4/5
+    const LOW_PAY = { '9':4, '10':4, 'J':6, 'Q':6, 'K':8, 'A':10 }; // per 3-match, scales x for 4/5
     const FISH = '🐟', CRAB = '🦀';
     const SCATTER = '🪝';
     const WILD = '🎣';
     const MONEY = '💰';
-    const MONEY_VALUES = [2,5,10,15,25,50,200]; // xBet, capped down from the real game's 2000x for balance
+    const MONEY_VALUES = [4,8,15,25,40,75,300]; // xBet, capped down from the real game's 2000x for balance
 
     const gridEl = document.getElementById('bfGrid');
     const msgEl = document.getElementById('bfMsg');
@@ -4360,22 +4416,22 @@
       [2,1,0,1,2],
     ];
 
-    let inFreeSpins = false, spinsLeft = 0, wildsCollected = 0, freeSpinMulti = 2, freeSpinTotalWin = 0;
+    let inFreeSpins = false, spinsLeft = 0, wildsCollected = 0, freeSpinMulti = 2, freeSpinTotalWin = 0, retriggersUsed = 0;
 
     function weightedSymbol(){
       // Scatter ~5% per cell -> roughly a 3.6% chance of landing 3+ scatters (and
-      // therefore triggering free spins) across a full 15-cell spin. (Was 9%/~15%,
-      // turned out to trigger way too often — this is a real rarity now.)
-      // Wild during free spins stays at ~0.07% per cell -> roughly 1% chance of a
-      // wild appearing at all per free spin, so retriggers are a real rarity.
-      // (Applies identically in Free Play and Challenge Mode, it's the same game.)
+      // therefore triggering free spins) across a full 15-cell spin.
+      // Wild during free spins ~2.5% per cell, so it doesn't feel like
+      // free spins go on forever. Retriggers are additionally hard-capped at 2 per
+      // free-spin session (see wildsCollected/retriggersUsed logic below), so even a
+      // lucky wild streak can't spiral into "infinite" free spins anymore.
       const r = Math.random();
       if(r < 0.05) return SCATTER;
       if(inFreeSpins){
-        if(r < 0.0507) return WILD;
-        if(r < 0.1807) return MONEY;
-        if(r < 0.2607) return FISH;
-        if(r < 0.3207) return CRAB;
+        if(r < 0.075) return WILD;
+        if(r < 0.205) return MONEY;
+        if(r < 0.285) return FISH;
+        if(r < 0.345) return CRAB;
       } else {
         if(r < 0.07) return WILD;
         if(r < 0.15) return FISH;
@@ -4421,8 +4477,8 @@
       if(sym === MONEY || sym === SCATTER) return 0;
       let base;
       if(LOW.includes(sym)) base = LOW_PAY[sym];
-      else if(sym === FISH) base = 8;
-      else if(sym === CRAB) base = 12;
+      else if(sym === FISH) base = 14;
+      else if(sym === CRAB) base = 20;
       else base = 0;
       if(count === 3) return base;
       if(count === 4) return base*3;
@@ -4569,8 +4625,9 @@
               moneyWin += moneyVals[key] * (bet/10) * freeSpinMulti;
               collected.add(key);
             }
-            if(wildsCollected % 4 === 0){
-              spinsLeft += 10; // no cap — as long as wilds keep landing, free spins keep piling up
+            if(wildsCollected % 4 === 0 && retriggersUsed < 2){
+              spinsLeft += 10;
+              retriggersUsed++;
               freeSpinMulti = freeSpinMulti === 2 ? 3 : (freeSpinMulti === 3 ? 10 : 10);
             }
           }
@@ -4583,9 +4640,10 @@
         if(!inFreeSpins && scatterCount >= 3){
           inFreeSpins = true;
           spinsLeft = scatterCount === 3 ? 10 : (scatterCount === 4 ? 15 : 20);
-          wildsCollected = 0; freeSpinMulti = 2; freeSpinTotalWin = 0;
+          wildsCollected = 0; freeSpinMulti = 2; freeSpinTotalWin = 0; retriggersUsed = 0;
           scatterMsg = ` 🪝×${scatterCount} — ${spinsLeft} Freispiele gestartet!`;
           unlockAchievement('bigfish_freespins');
+          betRow.querySelectorAll('.chip-btn, .bet-input').forEach(el => el.disabled = true);
         }
 
         const spinWin = luck(lineWin + moneyWin);
@@ -4602,18 +4660,37 @@
           updateMeter();
           if(spinsLeft <= 0){
             inFreeSpins = false;
+            betRow.querySelectorAll('.chip-btn, .bet-input').forEach(el => el.disabled = false);
             msgEl.textContent = `Freispiele beendet. Gesamtgewinn: +${fmt(freeSpinTotalWin)}${scatterMsg}`;
             updateMeter();
+            if(autoOn){ stopAuto(); }
+            showFreeSpinsSummary(freeSpinTotalWin);
           } else {
-            msgEl.textContent = (spinWin > 0 ? `+${fmt(spinWin)}` : 'Kein Treffer') + scatterMsg + ` — noch ${spinsLeft} Freispiele (Einsatz frei änderbar)`;
+            msgEl.textContent = (spinWin > 0 ? `💰 +${fmt(spinWin)} Chips!` : 'Kein Treffer') + scatterMsg + ` — noch ${spinsLeft} Freispiele`;
           }
         } else {
+          if(spinWin <= 0) lastBetWasAllIn = false;
           msgEl.textContent = spinWin > 0 ? `Gewonnen! +${fmt(spinWin)}${scatterMsg}` : ('Kein Treffer.' + scatterMsg);
         }
 
         spinBtn.disabled = false;
         if(onDone) onDone();
       });
+    }
+
+    function showFreeSpinsSummary(total){
+      const overlay = document.createElement('div');
+      overlay.className = 'freespins-summary-overlay';
+      overlay.innerHTML = `
+        <div class="freespins-summary-box">
+          <div class="freespins-summary-title">🎣 Freispiele beendet!</div>
+          <div class="freespins-summary-amount">Du hast <span>+${fmt(total)}</span> Chips gewonnen</div>
+          <button class="btn primary" id="freeSpinsSummaryCloseBtn">Weiterspielen</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      SoundEngine.victory();
+      document.getElementById('freeSpinsSummaryCloseBtn').addEventListener('click', () => overlay.remove());
     }
 
     let autoOn = false;
@@ -4759,6 +4836,7 @@
           if(floe) floe.classList.add('fallen');
           penguinEl.classList.add('falling');
           spawnSplash(targetLeft);
+          lastBetWasAllIn = false;
           msgEl.textContent = 'Ins Wasser gefallen — Einsatz verloren.';
           endRound(false);
         }
