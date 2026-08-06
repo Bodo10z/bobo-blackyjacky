@@ -587,6 +587,7 @@
   .num-cell.zero{ background: #0d5c33; grid-column: span 3; width:100%; }
   .num-cell:hover{ outline: 2px solid var(--gold-bright); }
   .num-cell.selected{ outline: 3px solid var(--gold-bright); box-shadow: 0 0 12px var(--gold); }
+  #numGrid.rl-locked, #outsideBets.rl-locked{ pointer-events: none; opacity: 0.55; filter: grayscale(0.4); }
   .outside-bets{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; max-width: 160px; }
   .out-bet{
     font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:7px 10px; border-radius:6px;
@@ -4105,6 +4106,9 @@
       markGamePlayed('roulette');
       spinBtn.disabled = true;
       rouletteLocked = true;
+      numGrid.classList.add('rl-locked');
+      outsideBets.classList.add('rl-locked');
+      const lockedSelection = { type: selection.type, val: selection.val }; // freeze the bet — nothing after this point can change the outcome
 
       const resultIdx = Math.floor(Math.random()*segCount);
       const resultNum = wheelOrderEU[resultIdx];
@@ -4125,7 +4129,7 @@
         resultNumEl.textContent = resultNum;
         resultNumEl.style.color = resultNum===0 ? '#3fd47a' : (RED_NUMS.has(resultNum) ? '#ff5d6c' : '#ede6d6');
         resultNumEl.classList.remove('pop'); void resultNumEl.offsetWidth; resultNumEl.classList.add('pop');
-        const mult = payoutMultiplier(selection.type, selection.val, resultNum);
+        const mult = payoutMultiplier(lockedSelection.type, lockedSelection.val, resultNum);
         if(mult > 0){
           const win = luck(bet*(mult+1));
           changeBalance(win);
@@ -4137,6 +4141,8 @@
           msgEl.textContent = `${resultNum} — kein Treffer.`;
         }
         rouletteLocked = false;
+        numGrid.classList.remove('rl-locked');
+        outsideBets.classList.remove('rl-locked');
         spinBtn.disabled = false;
         if(onDone) onDone();
       }, 4100);
