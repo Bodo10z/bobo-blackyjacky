@@ -2015,7 +2015,7 @@
       <button class="btn" id="bfAuto">Autospin</button>
     </div>
     <div class="paytable">
-      🪝🪝🪝 (3+) = Freispiele (10/15/20), <b>~3,6% Chance pro Spin</b> &nbsp;·&nbsp; 🎣 Angler ist Wild<br>
+      🪝🪝🪝 (3+) = Freispiele (10/15/20), <b>~2,3% Chance pro Spin</b> &nbsp;·&nbsp; 🎣 Angler ist Wild<br>
       💰 Geldfisch zeigt eigenen Wert — im Freispiel sammelt der Wild-Angler alle 💰 gleichzeitig ein<br>
       Jeder 4. gesammelte Wild = +10 Freispiele & höherer Multi (2x → 3x → 10x) — <b>max. 2 Retrigger pro Freispielrunde</b><br>
       Freispiele kosten keinen Einsatz — du kannst deinen Einsatz während der Freispiele jederzeit ändern
@@ -2362,8 +2362,9 @@
     document.body.classList.remove('shake-light'); void document.body.offsetWidth; document.body.classList.add('shake-light');
   }
 
-  function celebrateWin(amount, stakeForScale){
+  function celebrateWin(amount, stakeForScale, opts){
     if(!amount || amount <= 0) return;
+    const light = !!(opts && opts.light);
     const mult = stakeForScale ? amount / stakeForScale : 0;
     const tier = winTierFor(mult);
     const big = tier >= 2;
@@ -2400,10 +2401,12 @@
 
     countUpWinText(amount, tier);
     SoundEngine.winTier(Math.min(tier, 4));
-    if(epic) SoundEngine.impactBoom();
-    if(big){
-      SoundEngine.coinCascade(tier >= 6 ? 22 : tier >= 4 ? 14 : 8, tier >= 4 ? 1400 : 700);
-      SoundEngine.sparkleShimmer(tier >= 6 ? 26 : 14, 1200);
+    if(!light){
+      if(epic) SoundEngine.impactBoom();
+      if(big){
+        SoundEngine.coinCascade(tier >= 6 ? 22 : tier >= 4 ? 14 : 8, tier >= 4 ? 1400 : 700);
+        SoundEngine.sparkleShimmer(tier >= 6 ? 26 : 14, 1200);
+      }
     }
     winCelebrationText.classList.remove('show', 'huge'); void winCelebrationText.offsetWidth;
     winCelebrationText.classList.add('show'); if(epic) winCelebrationText.classList.add('huge');
@@ -2433,7 +2436,7 @@
       }, 1900);
     }
 
-    const n = tier >= 6 ? 70 : tier >= 5 ? 55 : tier >= 4 ? 44 : tier >= 2 ? 26 : 12;
+    const n = light ? Math.min(10, tier >= 4 ? 16 : 8) : (tier >= 6 ? 70 : tier >= 5 ? 55 : tier >= 4 ? 44 : tier >= 2 ? 26 : 12);
     const pieces = tier >= 4 ? ['🔥','💰','⭐','🎉','✨','💎','🌟','🎊'] : ['🎉','✨','💰','⭐','🎊','💎'];
     for(let i=0;i<n;i++){
       const p = document.createElement('div');
@@ -2450,7 +2453,7 @@
       setTimeout(() => p.remove(), 1600);
     }
 
-    if(big){
+    if(big && !light){
       const moneyPieces = ['💰','🪙','💵','💸'];
       const rainCount = tier >= 6 ? 60 : tier >= 5 ? 45 : tier >= 4 ? 35 : 20;
       for(let i=0;i<rainCount;i++){
@@ -2465,17 +2468,32 @@
         document.body.appendChild(m);
         setTimeout(() => m.remove(), 3200);
       }
+    } else if(big && light){
+      const moneyPieces = ['💰','🪙'];
+      for(let i=0;i<8;i++){
+        const m = document.createElement('div');
+        m.className = 'money-rain-piece';
+        m.textContent = moneyPieces[Math.floor(Math.random()*moneyPieces.length)];
+        m.style.left = Math.random()*100 + 'vw';
+        m.style.setProperty('--mr-rot', (Math.random()*720 - 360) + 'deg');
+        m.style.animationDuration = '1.2s';
+        m.style.fontSize = '1.2rem';
+        document.body.appendChild(m);
+        setTimeout(() => m.remove(), 1600);
+      }
     }
 
-    if(tier >= 6){
-      spawnFullscreenParticleBurst(90);
-      setTimeout(() => spawnFullscreenParticleBurst(60), 500);
-    } else if(tier === 5){
-      spawnFullscreenParticleBurst(70);
-    } else if(tier === 4){
-      spawnFullscreenParticleBurst(50);
-    } else if(tier === 3){
-      spawnFullscreenParticleBurst(30);
+    if(!light){
+      if(tier >= 6){
+        spawnFullscreenParticleBurst(90);
+        setTimeout(() => spawnFullscreenParticleBurst(60), 500);
+      } else if(tier === 5){
+        spawnFullscreenParticleBurst(70);
+      } else if(tier === 4){
+        spawnFullscreenParticleBurst(50);
+      } else if(tier === 3){
+        spawnFullscreenParticleBurst(30);
+      }
     }
   }
 
@@ -3591,10 +3609,13 @@
         syms = [0,0,0].map(() => BOSS_SLOT_SYMS[Math.floor(Math.random()*BOSS_SLOT_SYMS.length)]);
       } while(syms[0]===syms[1] && syms[1]===syms[2]);
     }
+    // two cherries showing (even on an otherwise "miss" roll) also counts as a hit
+    const cherryCount = syms.filter(s => s === '🍒').length;
+    const actualWin = win || cherryCount >= 2;
     const strips = [document.getElementById('bossStrip0'), document.getElementById('bossStrip1'), document.getElementById('bossStrip2')];
     let done = 0;
     strips.forEach((strip,i) => {
-      spinBossReel(strip, syms[i], Math.round((500+i*450) * reelSpeedMult()), () => { done++; if(done===3) setTimeout(onDone, 200); });
+      spinBossReel(strip, syms[i], Math.round((500+i*450) * reelSpeedMult()), () => { done++; if(done===3) setTimeout(() => onDone(actualWin), 200); });
     });
   }
 
@@ -3607,7 +3628,9 @@
     badgeEl.textContent = '?';
     const spins = 4*360;
     const landSlice = landedColor === 'red' ? Math.floor(Math.random()*10)*36 + 8 : Math.floor(Math.random()*10)*36 + 26;
-    bossWheelRotation += spins + landSlice - (bossWheelRotation % 360);
+    const targetAngle = 360 - landSlice; // invert, same as the main roulette wheel — a fixed pointer at
+    // top means rotating the disc by R brings the segment at (360-R) under it, not the segment at R itself
+    bossWheelRotation += spins + targetAngle - (bossWheelRotation % 360);
     wheelEl.style.transform = `rotate(${bossWheelRotation}deg)`;
     setTimeout(() => {
       badgeEl.textContent = landedColor === 'red' ? '🔴' : '⚫';
@@ -3629,6 +3652,10 @@
     }, 1400);
   }
 
+  function combatWinBonus(){
+    return challengeDifficulty === 'easy' ? 0.10 : 0;
+  }
+
   function showBossPick(kind, diff){
     const pickWrap = document.getElementById('bossPickChoice');
     pickWrap.innerHTML = '';
@@ -3644,12 +3671,12 @@
       btn.addEventListener('click', () => {
         pickWrap.style.display = 'none';
         if(kind === 'roulette'){
-          const landed = Math.random() < 0.5 ? 'red' : 'black';
-          const win = landed === opt.v;
+          const win = Math.random() < (0.5 + combatWinBonus());
+          const landed = win ? opt.v : (opt.v === 'red' ? 'black' : 'red');
           runBossRouletteSpin(landed, () => resolveRound(win, diff));
         } else {
-          const landed = Math.random() < 0.5 ? 'heads' : 'tails';
-          const win = landed === opt.v;
+          const win = Math.random() < (0.5 + combatWinBonus());
+          const landed = win ? opt.v : (opt.v === 'heads' ? 'tails' : 'heads');
           runBossCoinFlip(landed, () => resolveRound(win, diff));
         }
       });
@@ -3668,8 +3695,8 @@
 
     if(gameKey === 'slots'){
       bossMsgEl.textContent = `Angriff mit ${gameDef.label}…`;
-      const win = Math.random() < 0.47;
-      runBossSlots(win, () => resolveRound(win, diff));
+      const win = Math.random() < (0.47 + combatWinBonus());
+      runBossSlots(win, (actualWin) => resolveRound(actualWin, diff));
     } else {
       showBossPick(gameKey, diff);
     }
@@ -3680,7 +3707,7 @@
     let voiceKind;
     if(win){
       const crit = Math.random() < 0.15;
-      const dmg = Math.round((12 + Math.random()*8) * (1 + stats.dmgBonus/100) * (crit ? 1.8 : 1));
+      const dmg = Math.round((12 + Math.random()*8) * 1.3 * (1 + stats.dmgBonus/100) * (crit ? 1.8 : 1));
       bossState.hp = Math.max(0, bossState.hp - dmg);
       updateBossHpUI();
       SoundEngine.hitDealt();
@@ -3990,11 +4017,13 @@
         numGrid.appendChild(cell);
       }
     }
+    let rouletteLocked = false;
     function clearSelectionUI(){
       numGrid.querySelectorAll('.num-cell').forEach(c=>c.classList.remove('selected'));
       outsideBets.querySelectorAll('.out-bet').forEach(c=>c.classList.remove('selected'));
     }
     numGrid.addEventListener('click', e => {
+      if(rouletteLocked) return;
       const cell = e.target.closest('.num-cell');
       if(!cell) return;
       clearSelectionUI();
@@ -4003,6 +4032,7 @@
       msgEl.textContent = `Zahl ${selection.val} gewählt (35:1).`;
     });
     outsideBets.addEventListener('click', e => {
+      if(rouletteLocked) return;
       const cell = e.target.closest('.out-bet');
       if(!cell) return;
       clearSelectionUI();
@@ -4074,6 +4104,7 @@
       rentnerSay();
       markGamePlayed('roulette');
       spinBtn.disabled = true;
+      rouletteLocked = true;
 
       const resultIdx = Math.floor(Math.random()*segCount);
       const resultNum = wheelOrderEU[resultIdx];
@@ -4105,6 +4136,7 @@
           lastBetWasAllIn = false;
           msgEl.textContent = `${resultNum} — kein Treffer.`;
         }
+        rouletteLocked = false;
         spinBtn.disabled = false;
         if(onDone) onDone();
       }, 4100);
@@ -4419,23 +4451,23 @@
     let inFreeSpins = false, spinsLeft = 0, wildsCollected = 0, freeSpinMulti = 2, freeSpinTotalWin = 0, retriggersUsed = 0;
 
     function weightedSymbol(){
-      // Scatter ~5% per cell -> roughly a 3.6% chance of landing 3+ scatters (and
-      // therefore triggering free spins) across a full 15-cell spin.
-      // Wild during free spins ~2.5% per cell, so it doesn't feel like
+      // Scatter ~4.2% per cell -> roughly a 2.3% chance of landing 3+ scatters (and
+      // therefore triggering free spins) per spin — about a third rarer than before.
+      // Wild during free spins ~1.8% per cell, so it doesn't feel like
       // free spins go on forever. Retriggers are additionally hard-capped at 2 per
       // free-spin session (see wildsCollected/retriggersUsed logic below), so even a
       // lucky wild streak can't spiral into "infinite" free spins anymore.
       const r = Math.random();
-      if(r < 0.05) return SCATTER;
+      if(r < 0.042) return SCATTER;
       if(inFreeSpins){
-        if(r < 0.075) return WILD;
-        if(r < 0.205) return MONEY;
-        if(r < 0.285) return FISH;
-        if(r < 0.345) return CRAB;
+        if(r < 0.06) return WILD;
+        if(r < 0.19) return MONEY;
+        if(r < 0.27) return FISH;
+        if(r < 0.33) return CRAB;
       } else {
-        if(r < 0.07) return WILD;
-        if(r < 0.15) return FISH;
-        if(r < 0.21) return CRAB;
+        if(r < 0.112) return WILD;
+        if(r < 0.192) return FISH;
+        if(r < 0.252) return CRAB;
       }
       return LOW[Math.floor(Math.random()*LOW.length)];
     }
@@ -4650,8 +4682,8 @@
         if(inFreeSpins) freeSpinTotalWin += spinWin;
         if(spinWin > 0){
           changeBalance(spinWin);
-          celebrateWin(spinWin, bet);
-          burstConfettiBF(spinWin >= bet*15 ? 24 : 12);
+          celebrateWin(spinWin, bet, { light: inFreeSpins });
+          burstConfettiBF(inFreeSpins ? 6 : (spinWin >= bet*15 ? 24 : 12));
           if(spinWin >= bet*10){ gridWrap.classList.remove('shake'); void gridWrap.offsetWidth; gridWrap.classList.add('shake'); }
         }
 
