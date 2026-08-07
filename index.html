@@ -1272,6 +1272,64 @@
   .achv-desc{ font-family:'JetBrains Mono',monospace; font-size: 0.68rem; color: rgba(237,230,214,0.6); margin-top: 2px; }
   .achv-reward{ font-family:'JetBrains Mono',monospace; font-size: 0.75rem; font-weight:700; color: var(--gold-bright); white-space: nowrap; }
   .achv-reward.done{ color: rgba(237,230,214,0.4); }
+
+  /* ---------- RANK ---------- */
+  .rank-display{
+    display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px;
+    font-family:'JetBrains Mono',monospace; font-size:0.9rem; color: var(--gold-bright);
+    background: rgba(0,0,0,0.25); border:1px solid var(--gold); border-radius:999px; padding:8px 16px;
+  }
+  .mode-select-rank{
+    display:flex; align-items:center; justify-content:center; gap:8px; margin: 0 auto 14px;
+    font-family:'JetBrains Mono',monospace; font-size:0.85rem; color: var(--gold-bright);
+    background: rgba(0,0,0,0.25); border:1px solid var(--gold); border-radius:999px; padding:7px 16px;
+    max-width: fit-content;
+  }
+
+  /* ---------- DAILY CHALLENGE ---------- */
+  .daily-challenge-box{
+    max-width: 420px; margin: 0 auto 18px; padding: 10px 16px; border-radius: 12px;
+    background: rgba(0,0,0,0.25); border: 1px solid var(--line);
+    font-family:'JetBrains Mono',monospace; font-size: 0.78rem; color: rgba(237,230,214,0.85);
+    text-align:center;
+  }
+  .daily-challenge-box.ready{
+    border-color: var(--gold-bright); cursor:pointer; box-shadow: 0 0 14px rgba(212,175,55,0.4);
+    animation: achv-glow-pulse 1.8s ease-in-out infinite;
+  }
+  .daily-challenge-box .dc-title{ color: var(--gold); text-transform:uppercase; letter-spacing:0.08em; font-size:0.65rem; margin-bottom:4px; }
+
+  /* ---------- SETTINGS ---------- */
+  .settings-row{
+    display:flex; align-items:center; justify-content:space-between; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--line);
+    font-family:'Inter',sans-serif; font-size: 0.85rem; color: var(--cream);
+  }
+  .settings-row:last-of-type{ border-bottom:none; }
+  #volumeSlider{ width: 150px; accent-color: var(--gold-bright); }
+
+  /* ---------- DAILY BONUS ---------- */
+  .daily-streak-row{
+    display:flex; justify-content:center; gap:6px; margin: 14px 0; flex-wrap:wrap;
+  }
+  .daily-streak-day{
+    width: 34px; height: 34px; border-radius: 8px; display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size: 0.65rem; font-weight:700;
+    background: rgba(0,0,0,0.3); border: 1px solid var(--line); color: rgba(237,230,214,0.5);
+  }
+  .daily-streak-day.done{ background: var(--gold); color: var(--ink); border-color: var(--gold-bright); }
+  .daily-streak-day.today{ border-color: var(--gold-bright); box-shadow: 0 0 10px rgba(212,175,55,0.6); color: var(--gold-bright); }
+
+  /* ---------- WIN STREAK TOAST ---------- */
+  .streak-toast{
+    display:flex; align-items:center; gap: 10px;
+    background: linear-gradient(160deg, rgba(255,93,63,0.25), rgba(0,0,0,0.35)), var(--ink);
+    border: 2px solid #ff8f3f; border-radius: 12px; padding: 10px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(255,143,63,0.4);
+    max-width: min(280px, calc(100vw - 32px)); transform: translateX(-120%); opacity: 0;
+    animation: toast-in-out 3.2s ease forwards; pointer-events:none;
+    font-family:'JetBrains Mono',monospace; font-weight:800; color: #ffb454; font-size: 0.85rem;
+  }
   .achv-row.achv-finale.unlocked{
     border-color: #ff2d3d; background: linear-gradient(120deg, rgba(255,45,61,0.22), rgba(0,0,0,0.15));
     box-shadow: 0 0 14px rgba(255,45,61,0.4);
@@ -1515,6 +1573,7 @@
 <!-- CHALLENGE HUD (floating timer, visible during challenge prep) -->
 <button class="speed-toggle-btn" id="speedToggleBtn" title="Walzen-Geschwindigkeit">🚀 Normal</button>
 <button class="sound-toggle-btn" id="soundToggleBtn" title="Sound an/aus">🔊</button>
+<button class="sound-toggle-btn" id="settingsBtn" title="Einstellungen" style="right:108px;">⚙️</button>
 
 <div class="achievement-toast-layer" id="achievementToastLayer"></div>
 <div class="golden-theme-overlay"></div>
@@ -1606,12 +1665,50 @@
     <div class="modal-topline">
       <h2 style="margin:0;">🏆 Achievements</h2>
     </div>
+    <div class="rank-display" id="rankDisplay"></div>
     <p>Grau = noch offen. Gold = geschafft, klick drauf zum Abholen!</p>
     <div id="achievementsList"></div>
     <button class="modal-close-btn" id="achievementsClose">Schließen</button>
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box" style="max-width: 440px;">
+    <div class="modal-topline">
+      <h2 style="margin:0;">⚙️ Einstellungen</h2>
+    </div>
+    <div class="settings-row">
+      <label for="volumeSlider">🔊 Lautstärke</label>
+      <input type="range" id="volumeSlider" min="0" max="100" value="70">
+    </div>
+    <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
+      <label>💾 Spielstand</label>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn" id="exportSaveBtn" style="flex:1;">Exportieren</button>
+        <button class="btn" id="importSaveBtn" style="flex:1;">Importieren</button>
+      </div>
+      <textarea id="saveCodeArea" placeholder="Export-Code erscheint hier / Import-Code hier einfügen" style="display:none; width:100%; height:80px; background:var(--ink); color:var(--gold-bright); border:1px solid var(--gold); border-radius:8px; padding:8px; font-family:'JetBrains Mono',monospace; font-size:0.7rem;"></textarea>
+      <button class="btn" id="applyImportBtn" style="display:none;">Code übernehmen</button>
+    </div>
+    <div class="settings-row">
+      <label>🗑️ Alles zurücksetzen</label>
+      <button class="btn danger" id="resetProgressBtn">Reset</button>
+    </div>
+    <button class="modal-close-btn" id="settingsClose">Schließen</button>
+  </div>
+</div>
+
+<!-- DAILY BONUS MODAL -->
+<div class="modal-overlay" id="dailyBonusModal">
+  <div class="modal-box ad-box" style="max-width: 400px;">
+    <span class="ad-badge">Tages-Bonus</span>
+    <div class="ad-title" id="dailyBonusTitle">🎁 Willkommen zurück!</div>
+    <p id="dailyBonusDesc">Hol dir deinen täglichen Bonus ab.</p>
+    <div class="daily-streak-row" id="dailyStreakRow"></div>
+    <button class="ad-close" id="dailyBonusClaimBtn">Abholen</button>
+  </div>
+</div>
 
 <!-- START SCREEN -->
 <section class="screen active" id="screen-start">
@@ -1691,6 +1788,8 @@
     <div class="bg-fx-lobby" id="bgFxModeSelect"></div>
     <h2 class="menu-title">Wie willst du spielen?</h2>
     <div class="menu-sub">Wähl deinen Modus</div>
+    <div class="mode-select-rank" id="modeSelectRank"></div>
+    <div class="daily-challenge-box" id="dailyChallengeBox"></div>
     <div style="text-align:center; margin-bottom:22px;">
       <button class="btn" id="openAchievementsBtn">🏆 Achievements</button>
     </div>
@@ -2077,21 +2176,32 @@
   let challengeEquipped = { hat:null, hair:null, top:null, pants:null, shoes:null, item:null };
   let playerHp = 100, playerMaxHp = 100;
   let bossState = null;
+  let totalWagered = 0; // free-play only, drives the rank system
+  let winStreak = 0;
+  let dailyBonusDate = null, dailyBonusStreak = 0;
+  let dailyChallengeDate = null, dailyChallengeProgress = 0, dailyChallengeClaimed = false;
+  let luckySevenUsesLeft = 5;
 
   /* ================= SOUND ENGINE (synthesized, no audio files needed) ================= */
   const SoundEngine = (function(){
     let ctx = null;
     let enabled = true;
+    let masterGain = null;
+    let volume = 0.7; // 0..1
 
     function getCtx(){
       if(!ctx){
         const AC = window.AudioContext || window.webkitAudioContext;
         if(!AC) return null;
         ctx = new AC();
+        masterGain = ctx.createGain();
+        masterGain.gain.value = volume;
+        masterGain.connect(ctx.destination);
       }
       if(ctx.state === 'suspended') ctx.resume();
       return ctx;
     }
+    function destination(c){ return masterGain || c.destination; }
 
     function tone(freq, duration, opts){
       if(!enabled) return;
@@ -2110,7 +2220,7 @@
       gain.gain.exponentialRampToValueAtTime(vol, c.currentTime + 0.008);
       gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + duration);
       osc.connect(gain);
-      gain.connect(c.destination);
+      gain.connect(destination(c));
       osc.start(c.currentTime);
       osc.stop(c.currentTime + duration + 0.03);
     }
@@ -2132,7 +2242,7 @@
       const gain = c.createGain();
       gain.gain.setValueAtTime(opts.volume || 0.08, c.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + duration);
-      src.connect(filter); filter.connect(gain); gain.connect(c.destination);
+      src.connect(filter); filter.connect(gain); gain.connect(destination(c));
       src.start(c.currentTime);
     }
 
@@ -2142,6 +2252,11 @@
 
     return {
       unlock(){ getCtx(); },
+      setVolume(v){
+        volume = Math.max(0, Math.min(1, v));
+        if(masterGain) masterGain.gain.value = volume;
+      },
+      getVolume(){ return volume; },
       setEnabled(v){ enabled = v; },
       isEnabled(){ return enabled; },
       click(){
@@ -2272,7 +2387,15 @@
   function changeBalance(delta){
     balance += delta;
     if(balance < 0) balance = 0;
-    if(mode === 'free') savedFreeBalance = balance; // keep them permanently in sync, never let them drift apart
+    if(mode === 'free'){
+      savedFreeBalance = balance; // keep them permanently in sync, never let them drift apart
+      if(delta < 0){
+        totalWagered += -delta;
+        checkRankAchievement();
+        renderRankDisplays();
+      }
+      if(typeof saveGameDebounced === 'function') saveGameDebounced();
+    }
     renderBalance(true);
   }
   renderBalance(false);
@@ -2379,6 +2502,11 @@
       if(totalWinnings >= 10000) unlockAchievement('big_earner');
       if(lastBetWasAllIn){ unlockAchievement('all_in_win'); lastBetWasAllIn = false; }
     }
+
+    winStreak++;
+    if(winStreak >= 3) showStreakToast(winStreak);
+    updateDailyChallengeProgress('streak', winStreak);
+    updateDailyChallengeProgress('earn', amount);
 
     if(!winFlashEl){ winFlashEl = document.createElement('div'); winFlashEl.className = 'win-flash'; document.body.appendChild(winFlashEl); }
     if(!winBorderFrameEl){ winBorderFrameEl = document.createElement('div'); winBorderFrameEl.className = 'win-border-frame'; document.body.appendChild(winBorderFrameEl); }
@@ -2505,11 +2633,10 @@
     const logo = document.getElementById('luckySevenLogo');
     if(!logo) return;
     let clicks = 0;
-    let usesLeft = 5;
     let resetTimer = null;
     logo.addEventListener('click', () => {
       logo.classList.remove('logo-pulse'); void logo.offsetWidth; logo.classList.add('logo-pulse');
-      if(usesLeft <= 0){
+      if(luckySevenUsesLeft <= 0){
         rentnerSay('Nix mehr zu holen hier, das war\'s mit dem Trick.');
         return;
       }
@@ -2519,13 +2646,14 @@
       if(clicks >= 3){
         clicks = 0;
         clearTimeout(resetTimer);
-        usesLeft--;
+        luckySevenUsesLeft--;
         changeBalance(10);
         celebrateWin(10, 10);
-        if(usesLeft <= 0) unlockAchievement('lucky_seven_master');
-        rentnerSay(usesLeft > 0
-          ? `10 Chips für dich! Noch ${usesLeft}x drin.`
+        if(luckySevenUsesLeft <= 0) unlockAchievement('lucky_seven_master');
+        rentnerSay(luckySevenUsesLeft > 0
+          ? `10 Chips für dich! Noch ${luckySevenUsesLeft}x drin.`
           : '10 Chips für dich! Das war aber das letzte Mal.');
+        saveGame();
       }
     });
   })();
@@ -2538,6 +2666,11 @@
     screens.forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     SoundEngine.navClick();
+    if(id === 'screen-mode-select'){
+      renderRankDisplays();
+      renderDailyChallengeBox();
+      setTimeout(() => maybeShowDailyBonus(), 500);
+    }
   }
   document.getElementById('startBtn').addEventListener('click', () => {
     document.getElementById('genderModal').classList.add('active');
@@ -2747,7 +2880,22 @@
     SoundEngine.setEnabled(next);
     soundToggleBtn.textContent = next ? '🔊' : '🔇';
     soundToggleBtn.classList.toggle('muted', !next);
+    saveGame();
   });
+
+  const volumeSlider = document.getElementById('volumeSlider');
+  volumeSlider.addEventListener('input', () => {
+    SoundEngine.setVolume(volumeSlider.value / 100);
+    saveGame();
+  });
+  const settingsModal = document.getElementById('settingsModal');
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    volumeSlider.value = Math.round(SoundEngine.getVolume()*100);
+    document.getElementById('saveCodeArea').style.display = 'none';
+    document.getElementById('applyImportBtn').style.display = 'none';
+    settingsModal.classList.add('active');
+  });
+  document.getElementById('settingsClose').addEventListener('click', () => settingsModal.classList.remove('active'));
 
   /* reel speed control: 3 steps, affects Slots / Fischfang Deluxe / Boss-Slots pacing */
   const REEL_SPEEDS = [
@@ -3031,6 +3179,7 @@
     avatarWidget.classList.add('visible');
     renderAvatar();
     showScreen('screen-mode-select');
+    saveGame();
     setTimeout(() => rentnerSay(`Na ${playerName}, dann wollen wir mal die Bude aufmischen!`), 400);
   });
   document.getElementById('ageNoBtn').addEventListener('click', () => {
@@ -3072,7 +3221,7 @@
       cell.addEventListener('click', () => {
         eq[invActiveCat] = (eq[invActiveCat] === id) ? null : id;
         renderAvatar(); renderInvGrid();
-        if(mode === 'free') checkFullLegendaryOutfit();
+        if(mode === 'free'){ checkFullLegendaryOutfit(); saveGame(); }
       });
       invGrid.appendChild(cell);
     });
@@ -3165,6 +3314,7 @@
         SoundEngine.victory();
         rentnerSay('Jetzt glänzt hier wirklich alles, was?');
         renderShop();
+        saveGame();
       });
       row.appendChild(btn);
       block.appendChild(row);
@@ -3193,6 +3343,7 @@
         SoundEngine.victory();
         rentnerSay('Schau mich an, ich glitzere ja richtig!');
         renderShop();
+        saveGame();
       });
       row.appendChild(btn);
       block.appendChild(row);
@@ -3221,12 +3372,15 @@
     { id:'untouchable', icon:'🛡️', name:'Unantastbar', desc:'Die ersten beiden Bosse (Leicht & Mittel) besiegen, ohne einen einzigen Treffer zu kassieren', reward:10000 },
     { id:'boss_extreme_naked', icon:'💀', name:'Nacktes Grauen', desc:'Den Hausvorteil (Extrem) besiegen — komplett ohne Rüstung', reward:1000000 },
     { id:'unstoppable', icon:'🔥', name:'Unaufhaltsam', desc:'Alle 4 Bosse besiegt haben UND den Hausvorteil danach nochmal ganz ohne Rüstung bezwingen', reward:0, ticket:'gold_theme' },
+    { id:'rank_diamond', icon:'💠', name:'Diamant-Rang', desc:'Höchsten Rang erreichen (250.000 Chips verzockt)', reward:5000 },
+    { id:'daily_streak', icon:'📅', name:'Stammgast', desc:'3 Tage in Folge den Tages-Bonus abgeholt', reward:1000 },
     { id:'golden_ending', icon:'🏁', name:'Das Goldene Ende', desc:'Alle anderen Achievements freigeschaltet haben', reward:0, special:'ending' },
   ];
   const achvState = {}; // id -> { unlocked: bool, claimed: bool }
   ACHIEVEMENTS.forEach(a => { achvState[a.id] = { unlocked:false, claimed:false }; });
 
   const gamesPlayedSet = new Set();
+  let gamesPlayedTodaySet = new Set();
   let coinHeadsStreak = 0;
   let totalWinnings = 0;
   let lastBetWasAllIn = false;
@@ -3239,7 +3393,7 @@
   const flawlessBossWins = new Set();
 
   function creditFreePlayBalance(amount){
-    if(mode === 'challenge'){ savedFreeBalance += amount; }
+    if(mode === 'challenge'){ savedFreeBalance += amount; saveGame(); }
     else{ changeBalance(amount); }
   }
 
@@ -3275,6 +3429,53 @@
     setTimeout(() => toast.remove(), 4600);
   }
 
+  let lastStreakToastAt = 0;
+  function showStreakToast(streak){
+    const now = Date.now();
+    if(now - lastStreakToastAt < 1500) return; // avoid spamming on rapid autospin wins
+    lastStreakToastAt = now;
+    const layer = document.getElementById('achievementToastLayer');
+    const toast = document.createElement('div');
+    toast.className = 'streak-toast';
+    toast.textContent = `🔥 ${streak}x in Folge gewonnen!`;
+    layer.appendChild(toast);
+    setTimeout(() => toast.remove(), 3300);
+  }
+
+  /* ---- Rank system: 5 tiers based on total amount wagered in Free Play ---- */
+  const RANKS = [
+    { name:'Bronze',  icon:'🥉', threshold:0 },
+    { name:'Silber',  icon:'🥈', threshold:5000 },
+    { name:'Gold',    icon:'🥇', threshold:20000 },
+    { name:'Platin',  icon:'⭐', threshold:75000 },
+    { name:'Diamant', icon:'💠', threshold:250000 },
+  ];
+  function getCurrentRank(){
+    let r = RANKS[0];
+    for(const rank of RANKS) if(totalWagered >= rank.threshold) r = rank;
+    return r;
+  }
+  function getNextRank(){
+    const cur = getCurrentRank();
+    const idx = RANKS.indexOf(cur);
+    return RANKS[idx+1] || null;
+  }
+  function checkRankAchievement(){
+    if(getCurrentRank().name === 'Diamant') unlockAchievement('rank_diamond');
+  }
+  function renderRankDisplays(){
+    const rank = getCurrentRank();
+    const next = getNextRank();
+    const progressText = next
+      ? ` · noch ${fmt(next.threshold - totalWagered)} bis ${next.icon} ${next.name}`
+      : ' · höchster Rang erreicht!';
+    const html = `${rank.icon} Rang: ${rank.name}${progressText}`;
+    const rankDisplay = document.getElementById('rankDisplay');
+    const modeSelectRank = document.getElementById('modeSelectRank');
+    if(rankDisplay) rankDisplay.textContent = html;
+    if(modeSelectRank) modeSelectRank.textContent = html;
+  }
+
   function checkFullLegendaryOutfit(){
     const allLegendary = CAT_ORDER.every(cat => {
       const id = equipped[cat];
@@ -3288,6 +3489,9 @@
   function markGamePlayed(key){
     gamesPlayedSet.add(key);
     if(gamesPlayedSet.size >= 6) unlockAchievement('all_games');
+    ensureDailyChallenge();
+    gamesPlayedTodaySet.add(key);
+    updateDailyChallengeProgressAbsolute('games', gamesPlayedTodaySet.size);
   }
 
   /* ---- Achievements book modal ---- */
@@ -3336,6 +3540,7 @@
             }
             SoundEngine.buy();
           }
+          saveGame();
           renderAchievementsList();
         });
       }
@@ -3356,9 +3561,276 @@
   }
   document.getElementById('openAchievementsBtn').addEventListener('click', () => {
     renderAchievementsList();
+    renderRankDisplays();
     achievementsModal.classList.add('active');
   });
   document.getElementById('achievementsClose').addEventListener('click', () => achievementsModal.classList.remove('active'));
+
+  /* ============================================================
+     DAILY BONUS (with streak) & DAILY CHALLENGE
+  ============================================================ */
+  function todayString(){
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
+  function daysBetween(a, b){
+    return Math.round((new Date(b) - new Date(a)) / 86400000);
+  }
+
+  const DAILY_BONUS_BASE = 500;
+  const dailyBonusModal = document.getElementById('dailyBonusModal');
+
+  function maybeShowDailyBonus(){
+    const today = todayString();
+    if(dailyBonusDate === today) return; // already claimed today
+    let newStreak = 1;
+    if(dailyBonusDate){
+      const gap = daysBetween(dailyBonusDate, today);
+      newStreak = (gap === 1) ? dailyBonusStreak + 1 : 1;
+    }
+    const cappedStreak = Math.min(newStreak, 7);
+    const amount = DAILY_BONUS_BASE + (cappedStreak - 1) * 250;
+
+    document.getElementById('dailyBonusDesc').textContent =
+      dailyBonusDate ? `Tag ${cappedStreak} in Folge! Hol dir ${fmt(amount)} Chips ab.` : `Hol dir ${fmt(amount)} Chips ab, um zu starten.`;
+    const row = document.getElementById('dailyStreakRow');
+    row.innerHTML = '';
+    for(let i=1;i<=7;i++){
+      const d = document.createElement('div');
+      d.className = 'daily-streak-day' + (i < cappedStreak ? ' done' : '') + (i === cappedStreak ? ' today' : '');
+      d.textContent = i <= cappedStreak ? '✓' : ('T'+i);
+      row.appendChild(d);
+    }
+    const claimBtn = document.getElementById('dailyBonusClaimBtn');
+    claimBtn.textContent = `🎁 ${fmt(amount)} Chips abholen`;
+    claimBtn.onclick = () => {
+      dailyBonusDate = today;
+      dailyBonusStreak = newStreak;
+      creditFreePlayBalance(amount);
+      celebrateWin(amount, amount);
+      if(newStreak >= 3) unlockAchievement('daily_streak');
+      dailyBonusModal.classList.remove('active');
+      renderBalance(false);
+      renderRankDisplays();
+      saveGame();
+    };
+    dailyBonusModal.classList.add('active');
+  }
+
+  /* ---- Daily challenge: a fixed pseudo-random pick per day, resets daily ---- */
+  const DAILY_CHALLENGES = [
+    { id:'win3',      desc:'3 Gewinne in Folge einfahren', target:3,    type:'streak', reward:800 },
+    { id:'playAll',   desc:'Alle 6 Spiele einmal spielen',  target:6,    type:'games',  reward:800 },
+    { id:'earn2000',  desc:'2.000 Chips gewinnen (insgesamt)', target:2000, type:'earn', reward:800 },
+  ];
+  function pickDailyChallenge(dateStr){
+    let hash = 0;
+    for(let i=0;i<dateStr.length;i++) hash = (hash*31 + dateStr.charCodeAt(i)) % 1000;
+    return DAILY_CHALLENGES[hash % DAILY_CHALLENGES.length];
+  }
+  function ensureDailyChallenge(){
+    const today = todayString();
+    if(dailyChallengeDate !== today){
+      dailyChallengeDate = today;
+      dailyChallengeProgress = 0;
+      dailyChallengeClaimed = false;
+      gamesPlayedTodaySet = new Set();
+    }
+  }
+  function updateDailyChallengeProgress(kind, value){
+    ensureDailyChallenge();
+    if(dailyChallengeClaimed) return;
+    const challenge = pickDailyChallenge(dailyChallengeDate);
+    if(challenge.type !== kind) return;
+    if(kind === 'streak') dailyChallengeProgress = Math.max(dailyChallengeProgress, value);
+    else dailyChallengeProgress += value;
+    renderDailyChallengeBox();
+    saveGame();
+  }
+  function updateDailyChallengeProgressAbsolute(kind, value){
+    ensureDailyChallenge();
+    if(dailyChallengeClaimed) return;
+    const challenge = pickDailyChallenge(dailyChallengeDate);
+    if(challenge.type !== kind) return;
+    dailyChallengeProgress = Math.max(dailyChallengeProgress, value);
+    renderDailyChallengeBox();
+    saveGame();
+  }
+  function renderDailyChallengeBox(){
+    ensureDailyChallenge();
+    const box = document.getElementById('dailyChallengeBox');
+    if(!box) return;
+    const challenge = pickDailyChallenge(dailyChallengeDate);
+    const progress = Math.min(dailyChallengeProgress, challenge.target);
+    const ready = progress >= challenge.target && !dailyChallengeClaimed;
+    box.classList.toggle('ready', ready);
+    if(dailyChallengeClaimed){
+      box.innerHTML = `<div class="dc-title">Tages-Challenge</div>✓ Erledigt — komm morgen wieder!`;
+      box.onclick = null;
+    } else {
+      const progressText = challenge.type === 'earn' ? `${fmt(progress)} / ${fmt(challenge.target)}` : `${progress} / ${challenge.target}`;
+      box.innerHTML = `<div class="dc-title">Tages-Challenge</div>${challenge.desc} (${progressText})${ready ? ' — klick zum Abholen! 🎁' : ''}`;
+      box.onclick = ready ? () => {
+        dailyChallengeClaimed = true;
+        creditFreePlayBalance(challenge.reward);
+        celebrateWin(challenge.reward, challenge.reward);
+        renderBalance(false);
+        renderDailyChallengeBox();
+        saveGame();
+      } : null;
+    }
+  }
+
+
+  /* ============================================================
+     LOCAL SAVE / LOAD (persists progress between visits via localStorage).
+     Note: localStorage is blocked inside Claude.ai's sandboxed artifact
+     preview — it will silently no-op there. On a real page load (the file
+     opened directly, or hosted on GitHub Pages), it works completely
+     normally like on any other website.
+  ============================================================ */
+  const SAVE_KEY = 'luckySevenSaveV1';
+  let storageAvailable = true;
+  (function testStorage(){
+    try{ const k='__ls_test__'; localStorage.setItem(k,'1'); localStorage.removeItem(k); }
+    catch(e){ storageAvailable = false; }
+  })();
+
+  function collectSaveState(){
+    const achvSnapshot = {};
+    ACHIEVEMENTS.forEach(a => { achvSnapshot[a.id] = achvState[a.id]; });
+    return {
+      v: 1,
+      playerName,
+      avatarGender,
+      freeBalance: (mode === 'free') ? balance : savedFreeBalance,
+      owned, equipped,
+      achvState: achvSnapshot,
+      totalWinnings, totalWagered,
+      gamesPlayed: Array.from(gamesPlayedSet),
+      hasGoldenTicket, hasShimmerTicket,
+      goldenThemeActive: document.body.classList.contains('golden-theme'),
+      shimmerActive: avatarWidget.classList.contains('shimmer-gold'),
+      luckySevenUsesLeft,
+      dailyBonusDate, dailyBonusStreak,
+      dailyChallengeDate, dailyChallengeProgress, dailyChallengeClaimed,
+      gamesPlayedToday: Array.from(gamesPlayedTodaySet),
+      soundEnabled: SoundEngine.isEnabled(),
+      soundVolume: SoundEngine.getVolume(),
+    };
+  }
+
+  function saveGame(){
+    if(!storageAvailable) return;
+    try{ localStorage.setItem(SAVE_KEY, JSON.stringify(collectSaveState())); }
+    catch(e){ /* storage full or blocked — fail silently, nothing the player can do about it */ }
+  }
+  let saveDebounceTimer = null;
+  function saveGameDebounced(){
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(saveGame, 1500);
+  }
+
+  function loadGameRaw(){
+    if(!storageAvailable) return null;
+    try{
+      const raw = localStorage.getItem(SAVE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  function applySaveState(s){
+    if(!s) return;
+    if(s.playerName) playerName = s.playerName;
+    if(s.avatarGender) avatarGender = s.avatarGender;
+    if(typeof s.freeBalance === 'number'){ balance = s.freeBalance; savedFreeBalance = s.freeBalance; }
+    if(s.owned) CAT_ORDER.forEach(cat => { owned[cat] = Array.isArray(s.owned[cat]) ? s.owned[cat] : owned[cat]; });
+    if(s.equipped) CAT_ORDER.forEach(cat => { equipped[cat] = (cat in s.equipped) ? s.equipped[cat] : equipped[cat]; });
+    if(s.achvState){
+      ACHIEVEMENTS.forEach(a => {
+        if(s.achvState[a.id]) achvState[a.id] = s.achvState[a.id];
+      });
+    }
+    if(typeof s.totalWinnings === 'number') totalWinnings = s.totalWinnings;
+    if(typeof s.totalWagered === 'number') totalWagered = s.totalWagered;
+    (s.gamesPlayed || []).forEach(g => gamesPlayedSet.add(g));
+    hasGoldenTicket = !!s.hasGoldenTicket;
+    hasShimmerTicket = !!s.hasShimmerTicket;
+    if(s.goldenThemeActive) document.body.classList.add('golden-theme');
+    if(s.shimmerActive) avatarWidget.classList.add('shimmer-gold');
+    if(typeof s.luckySevenUsesLeft === 'number') luckySevenUsesLeft = s.luckySevenUsesLeft;
+    dailyBonusDate = s.dailyBonusDate || null;
+    dailyBonusStreak = s.dailyBonusStreak || 0;
+    dailyChallengeDate = s.dailyChallengeDate || null;
+    dailyChallengeProgress = s.dailyChallengeProgress || 0;
+    dailyChallengeClaimed = !!s.dailyChallengeClaimed;
+    gamesPlayedTodaySet = new Set(s.gamesPlayedToday || []);
+    if(s.soundEnabled === false){
+      SoundEngine.setEnabled(false);
+      soundToggleBtn.textContent = '🔇';
+      soundToggleBtn.classList.add('muted');
+    }
+    if(typeof s.soundVolume === 'number') SoundEngine.setVolume(s.soundVolume);
+  }
+
+  /* ---- Reset ---- */
+  document.getElementById('resetProgressBtn').addEventListener('click', () => {
+    if(!confirm('Wirklich ALLES zurücksetzen? Guthaben, Achievements, Klamotten, Rang, Tages-Boni — alles weg, das geht nicht rückgängig.')) return;
+    try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    location.reload();
+  });
+
+  /* ---- Export / Import ---- */
+  document.getElementById('exportSaveBtn').addEventListener('click', () => {
+    const data = JSON.stringify(collectSaveState());
+    let code;
+    try{ code = btoa(unescape(encodeURIComponent(data))); }
+    catch(e){ code = data; }
+    const area = document.getElementById('saveCodeArea');
+    area.value = code;
+    area.style.display = 'block';
+    document.getElementById('applyImportBtn').style.display = 'none';
+    area.select();
+    SoundEngine.buy();
+  });
+  document.getElementById('importSaveBtn').addEventListener('click', () => {
+    const area = document.getElementById('saveCodeArea');
+    area.value = '';
+    area.placeholder = 'Export-Code hier einfügen…';
+    area.style.display = 'block';
+    document.getElementById('applyImportBtn').style.display = 'block';
+    area.focus();
+  });
+  document.getElementById('applyImportBtn').addEventListener('click', () => {
+    const code = document.getElementById('saveCodeArea').value.trim();
+    if(!code) return;
+    try{
+      const data = JSON.parse(decodeURIComponent(escape(atob(code))));
+      applySaveState(data);
+      saveGame();
+      renderAvatar();
+      renderBalance(false);
+      renderRankDisplays();
+      renderDailyChallengeBox();
+      document.getElementById('saveCodeArea').style.display = 'none';
+      document.getElementById('applyImportBtn').style.display = 'none';
+      rentnerSay('Spielstand importiert, willkommen zurück!');
+    }catch(e){
+      alert('Das hat nicht geklappt — ist der Code komplett und unverändert kopiert?');
+    }
+  });
+
+  /* ---- Load on startup ---- */
+  const loadedSave = loadGameRaw();
+  if(loadedSave) applySaveState(loadedSave);
+  if(loadedSave && loadedSave.avatarGender){
+    avatarWidget.classList.add('visible');
+    renderAvatar();
+    showScreen('screen-mode-select');
+    setTimeout(() => rentnerSay(`Willkommen zurück, ${playerName}!`), 500);
+  }
 
 
   /* ============================================================
@@ -3925,14 +4397,14 @@
       if(forced === 'bust'){
         renderHands(true);
         SoundEngine.lose();
-        lastBetWasAllIn = false;
+        lastBetWasAllIn = false; winStreak = 0;
         msgEl.textContent = `Bust mit ${pVal}. Verloren.`;
         return;
       }
       if(forced === 'blackjack'){
         renderHands(true);
         const dealerHasBJ = dealerCards.length===2 && handValue(dealerCards)===21;
-        if(dealerHasBJ){ changeBalance(bet); lastBetWasAllIn = false; msgEl.textContent = 'Beide Blackjack — Push.'; }
+        if(dealerHasBJ){ changeBalance(bet); lastBetWasAllIn = false; winStreak = 0; msgEl.textContent = 'Beide Blackjack — Push.'; }
         else{ const win = luck(Math.floor(bet*2.5)); changeBalance(win); celebrateWin(win, bet); msgEl.textContent = `Blackjack! +${fmt(win)}`; }
         return;
       }
@@ -3957,8 +4429,8 @@
 
       if(dVal > 21){ const w=luck(bet*2); changeBalance(w); celebrateWin(w, bet); msgEl.textContent = `Dealer Bust (${dVal}). Du gewinnst +${fmt(w)}`; }
       else if(pVal > dVal){ const w=luck(bet*2); changeBalance(w); celebrateWin(w, bet); msgEl.textContent = `${pVal} schlägt ${dVal}. +${fmt(w)}`; }
-      else if(pVal === dVal){ changeBalance(bet); lastBetWasAllIn = false; msgEl.textContent = `Extrem seltener Gleichstand bei ${pVal} — Einsatz zurück.`; }
-      else{ lastBetWasAllIn = false; msgEl.textContent = `Dealer gewinnt ${dVal} gegen ${pVal}.`; }
+      else if(pVal === dVal){ changeBalance(bet); lastBetWasAllIn = false; winStreak = 0; msgEl.textContent = `Extrem seltener Gleichstand bei ${pVal} — Einsatz zurück.`; }
+      else{ lastBetWasAllIn = false; winStreak = 0; msgEl.textContent = `Dealer gewinnt ${dVal} gegen ${pVal}.`; }
     }
 
     dealBtn.addEventListener('click', startRound);
@@ -4144,7 +4616,7 @@
           msgEl.textContent = `${resultNum} — Treffer! +${fmt(win)}`;
         }else{
           SoundEngine.lose();
-          lastBetWasAllIn = false;
+          lastBetWasAllIn = false; winStreak = 0;
           msgEl.textContent = `${resultNum} — kein Treffer.`;
         }
         rouletteLocked = false;
@@ -4289,12 +4761,12 @@
           reelsEls.forEach(r => r.classList.add('win-glow'));
         } else {
           SoundEngine.lose();
-          lastBetWasAllIn = false;
+          lastBetWasAllIn = false; winStreak = 0;
           msgEl.textContent = 'Kein Treffer diesmal.';
         }
       } else {
         SoundEngine.lose();
-        lastBetWasAllIn = false;
+        lastBetWasAllIn = false; winStreak = 0;
         msgEl.textContent = 'Kein Treffer diesmal.';
       }
       if(win > 0){
@@ -4398,7 +4870,7 @@
           msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Gewonnen! +${fmt(payout)}`;
         }else{
           SoundEngine.lose();
-          lastBetWasAllIn = false;
+          lastBetWasAllIn = false; winStreak = 0;
           msgEl.textContent = `${result==='heads' ? 'Kopf' : 'Zahl'} — Verloren.`;
         }
         flipBtn.disabled = false; pickHeadBtn.disabled = false; pickTailBtn.disabled = false;
@@ -4714,7 +5186,7 @@
             msgEl.textContent = (spinWin > 0 ? `💰 +${fmt(spinWin)} Chips!` : 'Kein Treffer') + scatterMsg + ` — noch ${spinsLeft} Freispiele`;
           }
         } else {
-          if(spinWin <= 0) lastBetWasAllIn = false;
+          if(spinWin <= 0){ lastBetWasAllIn = false; winStreak = 0; }
           msgEl.textContent = spinWin > 0 ? `Gewonnen! +${fmt(spinWin)}${scatterMsg}` : ('Kein Treffer.' + scatterMsg);
         }
 
@@ -4881,7 +5353,7 @@
           if(floe) floe.classList.add('fallen');
           penguinEl.classList.add('falling');
           spawnSplash(targetLeft);
-          lastBetWasAllIn = false;
+          lastBetWasAllIn = false; winStreak = 0;
           msgEl.textContent = 'Ins Wasser gefallen — Einsatz verloren.';
           endRound(false);
         }
