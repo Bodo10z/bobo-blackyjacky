@@ -1239,7 +1239,9 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(212,175,55,0.4);
     max-width: min(300px, calc(100vw - 32px)); transform: translateX(-120%); opacity: 0;
     animation: toast-in-out 4.5s ease forwards;
+    pointer-events: auto; cursor: pointer; transition: transform 0.15s ease;
   }
+  .achievement-toast:hover{ transform: translateX(4px) scale(1.02) !important; }
   @keyframes toast-in-out{
     0%{ transform: translateX(-120%); opacity:0; }
     10%{ transform: translateX(0); opacity:1; }
@@ -3262,8 +3264,13 @@
     toast.className = 'achievement-toast';
     toast.innerHTML = `
       <span class="at-icon">${a.icon}</span>
-      <span class="at-text"><span class="at-title">Achievement freigeschaltet</span><br><span class="at-name">${a.name}</span></span>
+      <span class="at-text"><span class="at-title">Achievement freigeschaltet — antippen ✦</span><br><span class="at-name">${a.name}</span></span>
     `;
+    toast.addEventListener('click', () => {
+      toast.remove();
+      renderAchievementsList();
+      achievementsModal.classList.add('active');
+    });
     layer.appendChild(toast);
     setTimeout(() => toast.remove(), 4600);
   }
